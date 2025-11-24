@@ -21,6 +21,9 @@ export default function Dashboard() {
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
 
+    const [manualCode, setManualCode] = useState('')
+    const [connecting, setConnecting] = useState(false)
+
     useEffect(() => {
         fetchProfile()
     }, [])
