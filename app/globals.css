@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tiktok-cyan: #00f2ea;
+  --tiktok-pink: #ff0050;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: white;
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(90deg, var(--tiktok-cyan) 0%, var(--tiktok-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .gradient-border {
+    border-image: linear-gradient(90deg, var(--tiktok-cyan) 0%, var(--tiktok-pink) 100%) 1;
+  }
+}
