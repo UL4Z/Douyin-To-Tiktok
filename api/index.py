@@ -112,9 +112,9 @@ HTML_TEMPLATE = """
 
 # Routes
 
-@app.route('/')
-def home():
-    return "DTT API Service Running"
+@app.route('/api/health')
+def health_check():
+    return jsonify({"status": "healthy", "service": "DTT API"})
 
 import hashlib
 import base64
