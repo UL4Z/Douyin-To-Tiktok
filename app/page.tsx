@@ -1,10 +1,27 @@
 import Link from 'next/link'
 
 export default function Home() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
+
     return (
         <main className="min-h-screen">
+            {/* Header Navigation */}
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-tiktok-dark/80 backdrop-blur-md border-b border-gray-800">
+                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div className="text-xl font-bold gradient-text">
+                        Douyin↔TikTok
+                    </div>
+                    <a
+                        href={`${apiUrl}/api/auth/tiktok`}
+                        className="px-6 py-2 bg-gradient-to-r from-tiktok-cyan to-tiktok-pink text-black font-semibold rounded-lg hover:shadow-lg hover:shadow-tiktok-cyan/30 transition-all"
+                    >
+                        Login
+                    </a>
+                </div>
+            </nav>
+
             {/* Hero Section */}
-            <section className="container mx-auto px-6 py-20">
+            <section className="container mx-auto px-6 py-20 mt-16">{/* Added mt-16 for header spacing */}
                 <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-6xl font-bold mb-6">
                         <span className="gradient-text">Douyin to TikTok</span>

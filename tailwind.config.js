@@ -15,6 +15,20 @@ module.exports = {
                     'dark-card': '#1f1f1f',
                 },
             },
+            animation: {
+                'orbit-1': 'orbit1 1.5s linear infinite',
+                'orbit-2': 'orbit2 1.5s linear infinite',
+            },
+            keyframes: {
+                orbit1: {
+                    '0%': { transform: 'rotate(0deg) translateX(24px) rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg) translateX(24px) rotate(-360deg)' },
+                },
+                orbit2: {
+                    '0%': { transform: 'rotate(180deg) translateX(24px) rotate(-180deg)' },
+                    '100%': { transform: 'rotate(540deg) translateX(24px) rotate(-540deg)' },
+                },
+            },
         },
     },
     plugins: [],

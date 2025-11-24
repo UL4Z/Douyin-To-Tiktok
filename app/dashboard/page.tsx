@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import TikTokLoader from '../components/TikTokLoader'
 
 interface ProfileData {
     display_name: string
@@ -65,12 +66,49 @@ export default function Dashboard() {
         }
     }
 
+    const handleUnlinkTikTok = async () => {
+        if (!confirm('Are you sure you want to unlink your TikTok account? This will remove all your data.')) return
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok/unlink`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+            if (res.ok) {
+                router.push('/')
+            } else {
+                alert('Failed to unlink TikTok')
+            }
+        } catch (err) {
+            console.error('Unlink failed:', err)
+            alert('Failed to unlink TikTok')
+        }
+    }
+
+    const handleUnlinkDiscord = async () => {
+        if (!confirm('Are you sure you want to unlink your Discord account?')) return
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/discord/unlink`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+            if (res.ok) {
+                // Refresh to show updated state
+                fetchProfile()
+            } else {
+                alert('Failed to unlink Discord')
+            }
+        } catch (err) {
+            console.error('Unlink failed:', err)
+            alert('Failed to unlink Discord')
+        }
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-4xl mb-4">⏳</div>
-                    <p className="text-gray-400">Loading your profile...</p>
+                    <TikTokLoader />
+                    <p className="text-gray-400 mt-4">Loading your profile...</p>
                 </div>
             </div>
         )
@@ -197,12 +235,20 @@ export default function Dashboard() {
                             </p>
 
                             {/* Discord Linking Status */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-wrap">
                                 {profile.discord_username ? (
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2]/20 border border-[#5865F2]/50 rounded-lg text-[#5865F2]">
-                                        <span className="text-lg">👾</span>
-                                        <span className="font-medium">Linked as {profile.discord_username}</span>
-                                    </div>
+                                    <>
+                                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2]/20 border border-[#5865F2]/50 rounded-lg text-[#5865F2]">
+                                            <span className="text-lg">👾</span>
+                                            <span className="font-medium">Linked as {profile.discord_username}</span>
+                                        </div>
+                                        <button
+                                            onClick={handleUnlinkDiscord}
+                                            className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 rounded-lg transition-all text-sm"
+                                        >
+                                            Unlink Discord
+                                        </button>
+                                    </>
                                 ) : (
                                     <button
                                         onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/discord`}
@@ -212,6 +258,12 @@ export default function Dashboard() {
                                         Link Discord Account
                                     </button>
                                 )}
+                                <button
+                                    onClick={handleUnlinkTikTok}
+                                    className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 rounded-lg transition-all text-sm"
+                                >
+                                    Unlink TikTok
+                                </button>
                             </div>
                         </div>
                     </div>

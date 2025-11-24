@@ -443,6 +443,61 @@ def logout():
     session.clear()
     return jsonify({"success": True})
 
+@app.route('/api/auth/tiktok/unlink', methods=['POST'])
+def unlink_tiktok():
+    """Unlink TikTok account"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    db = SessionLocal()
+    try:
+        # Delete all TikTok tokens for this user
+        db.query(TikTokToken).filter_by(user_id=user_id).delete()
+        
+        # Delete TikTok profile
+        db.query(TikTokProfile).filter_by(user_id=user_id).delete()
+        
+        # Clear TikTok open_id from user
+        user = db.query(User).filter_by(id=user_id).first()
+        if user:
+            user.tiktok_open_id = None
+        
+        db.commit()
+        
+        # Clear session
+        session.clear()
+        
+        return jsonify({"success": True, "message": "TikTok account unlinked"})
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+@app.route('/api/auth/discord/unlink', methods=['POST'])
+def unlink_discord():
+    """Unlink Discord account"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter_by(id=user_id).first()
+        if user:
+            user.discord_id = None
+            user.discord_username = None
+            db.commit()
+            return jsonify({"success": True, "message": "Discord account unlinked"})
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
 @app.route('/api/auth/session')
 def get_session():
     """Get current session"""
