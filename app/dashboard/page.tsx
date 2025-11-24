@@ -76,8 +76,7 @@ export default function Dashboard() {
         )
     }
 
-    const [manualCode, setManualCode] = useState('')
-    const [connecting, setConnecting] = useState(false)
+
 
     const handleManualConnect = async () => {
         if (!manualCode) return
