@@ -6,7 +6,14 @@ export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "sqlite",
     }),
-    emailAndPassword: {
-        enabled: true
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID || "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        },
+        tiktok: {
+            clientId: process.env.TIKTOK_CLIENT_ID || "",
+            clientSecret: process.env.TIKTOK_CLIENT_SECRET || "",
+        },
     },
 });
