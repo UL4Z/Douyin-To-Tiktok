@@ -14,13 +14,6 @@ function LoginForm() {
         });
     };
 
-    const handleTikTokSignIn = async () => {
-        await authClient.signIn.social({
-            provider: 'tiktok',
-            callbackURL: '/dashboard',
-        });
-    };
-
     return (
         <div className="bg-surface/80 backdrop-blur-xl border border-white/5 rounded-2xl p-8 shadow-2xl card-shadow">
             <div className="text-center mb-8">
@@ -28,7 +21,7 @@ function LoginForm() {
                     Get Started Free
                 </h1>
                 <p className="text-accent-light">
-                    Sign in with your preferred account to continue
+                    Sign in with your Google account to continue
                 </p>
             </div>
 
@@ -45,17 +38,6 @@ function LoginForm() {
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </svg>
                     Continue with Google
-                </button>
-
-                {/* TikTok Sign In */}
-                <button
-                    onClick={handleTikTokSignIn}
-                    className="w-full py-4 bg-black text-white font-semibold rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border border-gray-700"
-                >
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                    </svg>
-                    Continue with TikTok
                 </button>
             </div>
 
@@ -94,7 +76,7 @@ export default function LoginPage() {
 
                 {/* Login Card */}
                 <Suspense fallback={
-                    <div className="bg-surface/80 backdrop-blur-xl border border-white/5 rounded-2xl p-8 shadow-2xl card-shadow h-[400px] flex items-center justify-center">
+                    <div className="bg-surface/80 backdrop-blur-xl border border-white/5 rounded-2xl p-8 shadow-2xl card-shadow h-[300px] flex items-center justify-center">
                         <span className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                 }>
