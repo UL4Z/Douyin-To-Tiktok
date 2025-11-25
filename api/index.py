@@ -277,9 +277,14 @@ def tiktok_callback():
 @app.route('/api/auth/discord')
 def discord_auth():
     """Initiate Discord OAuth flow for linking"""
+    # Validate Discord OAuth is configured
+    if not DISCORD_CLIENT_ID or not DISCORD_REDIRECT_URI:
+        print("ERROR: Discord OAuth not configured - missing DISCORD_CLIENT_ID or DISCORD_REDIRECT_URI")
+        return redirect("/dashboard?error=discord_not_configured")
+    
     user_id = session.get('user_id')
     if not user_id:
-        return jsonify({"error": "Not authenticated"}), 401
+        return redirect("/login?error=not_authenticated")
         
     state = secrets.token_urlsafe(32)
     session['discord_oauth_state'] = state
@@ -298,64 +303,98 @@ def discord_auth():
 @app.route('/api/auth/discord/callback')
 def discord_callback():
     """Handle Discord OAuth callback"""
-    code = request.args.get('code')
-    state = request.args.get('state')
-    error = request.args.get('error')
-    
-    if error:
-        return jsonify({"error": error}), 400
-        
-    # Verify state
-    if state != session.get('discord_oauth_state'):
-        return jsonify({"error": "Invalid state"}), 400
-        
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({"error": "Not authenticated"}), 401
-        
-    # Exchange code for token
-    data = {
-        'client_id': DISCORD_CLIENT_ID,
-        'client_secret': DISCORD_CLIENT_SECRET,
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': DISCORD_REDIRECT_URI,
-    }
-    
-    response = requests.post(DISCORD_TOKEN_URL, data=data, headers={
-        'Content-Type': 'application/x-www-form-urlencoded'
-    })
-    
-    if response.status_code != 200:
-        return jsonify({"error": "Token exchange failed"}), 400
-        
-    token_data = response.json()
-    access_token = token_data.get('access_token')
-    
-    # Get user info
-    user_response = requests.get(f"{DISCORD_API_BASE}/users/@me", headers={
-        'Authorization': f"Bearer {access_token}"
-    })
-    
-    if user_response.status_code != 200:
-        return jsonify({"error": "Failed to get user info"}), 400
-        
-    discord_user = user_response.json()
-    discord_id = discord_user.get('id')
-    discord_username = discord_user.get('username')
-    
-    # Link to existing user
-    db = SessionLocal()
     try:
-        user = db.query(User).filter_by(id=user_id).first()
-        if user:
+        # Validate Discord OAuth is configured
+        if not DISCORD_CLIENT_ID or not DISCORD_CLIENT_SECRET or not DISCORD_REDIRECT_URI:
+            print("ERROR: Discord OAuth not configured - missing required environment variables")
+            print(f"DISCORD_CLIENT_ID: {'set' if DISCORD_CLIENT_ID else 'MISSING'}")
+            print(f"DISCORD_CLIENT_SECRET: {'set' if DISCORD_CLIENT_SECRET else 'MISSING'}")
+            print(f"DISCORD_REDIRECT_URI: {'set' if DISCORD_REDIRECT_URI else 'MISSING'}")
+            return redirect("/dashboard?error=discord_not_configured")
+        
+        code = request.args.get('code')
+        state = request.args.get('state')
+        error = request.args.get('error')
+        
+        if error:
+            return redirect("/dashboard?error=discord_auth_failed")
+            
+        # Verify state
+        if state != session.get('discord_oauth_state'):
+            return redirect("/dashboard?error=invalid_state")
+            
+        user_id = session.get('user_id')
+        if not user_id:
+            return redirect("/login?error=not_authenticated")
+            
+        # Exchange code for token
+        data = {
+            'client_id': DISCORD_CLIENT_ID,
+            'client_secret': DISCORD_CLIENT_SECRET,
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': DISCORD_REDIRECT_URI,
+        }
+        
+        response = requests.post(DISCORD_TOKEN_URL, data=data, headers={
+            'Content-Type': 'application/x-www-form-urlencoded'
+        })
+        
+        if response.status_code != 200:
+            print(f"Discord token exchange failed: {response.text}")
+            return redirect("/dashboard?error=token_exchange_failed")
+            
+        token_data = response.json()
+        access_token = token_data.get('access_token')
+        
+        if not access_token:
+            print(f"No access token in response: {token_data}")
+            return redirect("/dashboard?error=no_access_token")
+        
+        # Get user info
+        user_response = requests.get(f"{DISCORD_API_BASE}/users/@me", headers={
+            'Authorization': f"Bearer {access_token}"
+        })
+        
+        if user_response.status_code != 200:
+            print(f"Discord user info failed: {user_response.text}")
+            return redirect("/dashboard?error=user_info_failed")
+            
+        discord_user = user_response.json()
+        discord_id = discord_user.get('id')
+        discord_username = discord_user.get('username')
+        
+        if not discord_id or not discord_username:
+            print(f"Missing Discord user data: {discord_user}")
+            return redirect("/dashboard?error=incomplete_user_data")
+        
+        # Link to existing user
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter_by(id=user_id).first()
+            if not user:
+                print(f"User not found: {user_id}")
+                return redirect("/login?error=user_not_found")
+                
             user.discord_id = discord_id
             user.discord_username = discord_username
             db.commit()
-    finally:
-        db.close()
+            print(f"Successfully linked Discord {discord_username} to user {user_id}")
+        except Exception as db_error:
+            db.rollback()
+            print(f"Database error during Discord linking: {db_error}")
+            return redirect("/dashboard?error=database_error")
+        finally:
+            db.close()
+            
+        # Redirect to dashboard with success message
+        return redirect("/dashboard?discord_linked=true")
         
-    return render_template_string(HTML_TEMPLATE)
+    except Exception as e:
+        print(f"Unexpected error in Discord callback: {e}")
+        import traceback
+        traceback.print_exc()
+        return redirect("/dashboard?error=unexpected_error")
 
 def fetch_and_save_profile(user_id, access_token, db):
     """Fetch TikTok profile and save to database"""

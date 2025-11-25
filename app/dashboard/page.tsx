@@ -31,11 +31,18 @@ export default function Dashboard() {
 
     const fetchProfile = async () => {
         try {
+            // In development, we might want to skip the API call entirely if we know it's offline
+            // But let's try it, and fallback if it fails.
+
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`, {
                 credentials: 'include'
             })
 
             if (res.status === 401) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('⚠️ Auth failed (401), but using mock data for development')
+                    throw new Error('Unauthorized (Mock fallback)')
+                }
                 // Not authenticated, redirect to OAuth
                 window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok`
                 return
@@ -48,7 +55,24 @@ export default function Dashboard() {
             const data = await res.json()
             setProfile(data)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error')
+            console.error('Profile fetch failed:', err)
+            // Mock data for offline development
+            if (process.env.NODE_ENV === 'development') {
+                console.log('⚠️ Using mock profile data for development')
+                setProfile({
+                    display_name: 'Dev User',
+                    avatar: null,
+                    follower_count: 12500,
+                    following_count: 42,
+                    likes_count: 50000,
+                    video_count: 128,
+                    bio_description: 'Mock profile for offline testing 🛠️',
+                    is_verified: true,
+                    discord_username: 'DevDiscord#1234'
+                })
+            } else {
+                setError(err instanceof Error ? err.message : 'Unknown error')
+            }
         } finally {
             setLoading(false)
         }

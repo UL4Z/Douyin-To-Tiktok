@@ -3,24 +3,51 @@
 @tailwind utilities;
 
 :root {
-  --tiktok-cyan: #00f2ea;
-  --tiktok-pink: #ff0050;
+  /* Dark Red Panda Palette */
+  --primary: #FF5E3A;
+  /* Warm Red-Orange */
+  --primary-dark: #D94126;
+  --secondary: #2D1A1A;
+  /* Deep Brown/Soft Black (Background) */
+  --accent: #FFF8F0;
+  /* Cream/Off-White (Text) */
+  --accent-light: #D4C5C5;
+  /* Soft Grey-Brown (Secondary Text) */
+  --surface: #1F1212;
+  /* Darker Brown (Cards/Nav) */
+  --success: #4CAF50;
+  --warning: #FFC107;
+  --error: #FF5252;
 }
 
 body {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  color: white;
+  background-color: var(--secondary);
+  color: var(--accent);
+  font-family: 'Inter', sans-serif;
 }
 
 @layer utilities {
+  .text-primary {
+    color: var(--primary);
+  }
+
+  .bg-primary {
+    background-color: var(--primary);
+  }
+
   .gradient-text {
-    background: linear-gradient(90deg, var(--tiktok-cyan) 0%, var(--tiktok-pink) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, #FF8566 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  .gradient-border {
-    border-image: linear-gradient(90deg, var(--tiktok-cyan) 0%, var(--tiktok-pink) 100%) 1;
+
+  .gradient-bg {
+    background: linear-gradient(135deg, var(--primary) 0%, #FF8566 100%);
+  }
+
+  .card-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    /* Darker shadow for dark theme */
   }
 }

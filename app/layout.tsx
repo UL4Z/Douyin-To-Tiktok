@@ -1,5 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
+import MochiMascot from './components/Mochi/MochiMascot'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,8 +17,8 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-tiktok-cyan to-tiktok-pink z-50" />
                 {children}
+                <MochiMascot autoTalk={true} size="md" />
             </body>
         </html>
     )

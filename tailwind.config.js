@@ -8,16 +8,29 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                tiktok: {
-                    cyan: '#00f2ea',
-                    pink: '#ff0050',
-                    dark: '#121212',
-                    'dark-card': '#1f1f1f',
+                primary: {
+                    DEFAULT: 'var(--primary)',
+                    dark: 'var(--primary-dark)',
                 },
+                secondary: 'var(--secondary)',
+                accent: {
+                    DEFAULT: 'var(--accent)',
+                    light: 'var(--accent-light)',
+                },
+                surface: 'var(--surface)',
+                success: 'var(--success)',
+                warning: 'var(--warning)',
+                error: 'var(--error)',
+            },
+            borderRadius: {
+                'xl': '1rem',
+                '2xl': '1.5rem',
+                '3xl': '2rem',
             },
             animation: {
                 'orbit-1': 'orbit1 1.5s linear infinite',
                 'orbit-2': 'orbit2 1.5s linear infinite',
+                'float': 'float 6s ease-in-out infinite',
             },
             keyframes: {
                 orbit1: {
@@ -28,6 +41,10 @@ module.exports = {
                     '0%': { transform: 'rotate(180deg) translateX(24px) rotate(-180deg)' },
                     '100%': { transform: 'rotate(540deg) translateX(24px) rotate(-540deg)' },
                 },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                }
             },
         },
     },
