@@ -63,17 +63,17 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
     // Adjusted positions to overlap Mochi
     const bubbleStyles = {
         'bottom-right': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-10px]', // Overlapping Mochi (negative margin)
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20', // Original gradient style
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-30px]', // More overlap
+            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
             tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
         },
         'bottom-left': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-10px]', // Overlapping Mochi
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-30px]', // More overlap
             bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
             tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
         },
         'top-left': {
-            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-[-10px]', // Overlapping Mochi
+            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-[-20px]', // More overlap
             bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
             tail: 'absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-t border-l border-primary/20 transform rotate-45'
         }
