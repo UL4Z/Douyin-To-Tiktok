@@ -13,3 +13,7 @@ export async function GET() {
         return NextResponse.json({ status: 'error', message: 'DB failed', error: error.message }, { status: 500 });
     }
 }
+
+export async function POST() {
+    return NextResponse.json({ status: 'ok', message: 'POST works' });
+}
