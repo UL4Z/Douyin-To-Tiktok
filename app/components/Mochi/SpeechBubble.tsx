@@ -60,22 +60,22 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
         setLanguage(prev => prev === 'en' ? 'cn' : 'en');
     };
 
-    // Adjusted positions to be MUCH closer to Mochi
+    // Adjusted positions to overlap Mochi
     const bubbleStyles = {
         'bottom-right': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-1', // MUCH closer (mb-1)
-            bubble: 'backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]', // Liquid Glass
-            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 backdrop-blur-xl bg-white/30 border-b border-r border-white/40 transform rotate-45'
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-10px]', // Overlapping Mochi (negative margin)
+            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20', // Original gradient style
+            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
         },
         'bottom-left': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-1',
-            bubble: 'backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]',
-            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 backdrop-blur-xl bg-white/30 border-b border-r border-white/40 transform rotate-45'
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-10px]', // Overlapping Mochi
+            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
+            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
         },
         'top-left': {
-            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-1',
-            bubble: 'backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]',
-            tail: 'absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 backdrop-blur-xl bg-white/30 border-t border-l border-white/40 transform rotate-45'
+            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-[-10px]', // Overlapping Mochi
+            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
+            tail: 'absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-t border-l border-primary/20 transform rotate-45'
         }
     };
 
