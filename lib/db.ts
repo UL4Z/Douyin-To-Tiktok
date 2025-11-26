@@ -86,5 +86,5 @@ const runMigrations = async () => {
     }
 };
 
-// Fire and forget migration
-runMigrations();
+// Fire and forget migration but export the promise
+export const migrationPromise = runMigrations();

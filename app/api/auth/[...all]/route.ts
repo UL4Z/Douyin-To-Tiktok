@@ -1,9 +1,11 @@
 import { auth } from "@/lib/auth";
 import { toNextJsHandler } from "better-auth/next-js";
 import { NextResponse } from "next/server";
+import { migrationPromise } from "@/lib/db";
 
 export const GET = async (req: Request) => {
     try {
+        await migrationPromise;
         return await auth.handler(req);
     } catch (error: any) {
         console.error("Auth GET Error:", error);
@@ -13,6 +15,7 @@ export const GET = async (req: Request) => {
 
 export const POST = async (req: Request) => {
     try {
+        await migrationPromise;
         return await auth.handler(req);
     } catch (error: any) {
         console.error("Auth POST Error:", error);

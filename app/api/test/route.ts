@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { db, migrationPromise } from '@/lib/db';
 import { user } from '@/auth-schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET() {
     try {
+        await migrationPromise;
         console.log('Test route hit.');
 
         // Test 1: Drizzle Write
