@@ -63,19 +63,19 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
     // Adjusted positions to be MUCH closer to Mochi
     const bubbleStyles = {
         'bottom-right': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-4', // Centered horizontally, slightly higher
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45' // Centered on bubble
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-1', // MUCH closer (mb-1)
+            bubble: 'backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]', // Liquid Glass
+            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 backdrop-blur-xl bg-white/30 border-b border-r border-white/40 transform rotate-45'
         },
         'bottom-left': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-4',
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-1',
+            bubble: 'backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]',
+            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 backdrop-blur-xl bg-white/30 border-b border-r border-white/40 transform rotate-45'
         },
         'top-left': {
-            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-4',
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-t border-l border-primary/20 transform rotate-45'
+            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-1',
+            bubble: 'backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]',
+            tail: 'absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 backdrop-blur-xl bg-white/30 border-t border-l border-white/40 transform rotate-45'
         }
     };
 
@@ -87,9 +87,9 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className={`${currentStyle.container} w-[220px] z-50`} // Fixed width, smaller
+            className={`${currentStyle.container} w-[180px] z-50`} // Smaller width
         >
-            <div className={`${currentStyle.bubble} rounded-2xl p-4 shadow-2xl border relative text-accent`}>
+            <div className={`${currentStyle.bubble} rounded-2xl p-3 text-accent`}>
                 {/* Header with Language Switch */}
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
