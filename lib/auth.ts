@@ -12,4 +12,5 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
     },
+    baseURL: process.env.BETTER_AUTH_URL, // Explicitly set base URL
 });
