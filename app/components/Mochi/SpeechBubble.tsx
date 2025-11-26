@@ -63,19 +63,19 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
     // Adjusted positions to be MUCH closer to Mochi
     const bubbleStyles = {
         'bottom-right': {
-            container: 'absolute bottom-full right-0 mb-[-40px] mr-[-60px]', // Lower and more to the right
+            container: 'absolute bottom-full right-0 mb-[-40px]',
             bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -bottom-3 right-8 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
+            tail: 'absolute -bottom-3 right-16 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45' // Centered on Mochi
         },
         'bottom-left': {
-            container: 'absolute bottom-full left-0 mb-[-12px] ml-[-20px]',
+            container: 'absolute bottom-full left-0 mb-[-40px]',
             bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -bottom-3 left-8 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
+            tail: 'absolute -bottom-3 left-16 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45' // Centered on Mochi
         },
         'top-left': {
-            container: 'absolute top-full left-0 mt-[-12px] ml-[-20px]',
+            container: 'absolute top-full left-0 mt-[-12px]',
             bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -top-3 left-8 w-6 h-6 bg-secondary border-t border-l border-primary/20 transform rotate-45'
+            tail: 'absolute -top-3 left-16 w-6 h-6 bg-secondary border-t border-l border-primary/20 transform rotate-45'
         }
     };
 

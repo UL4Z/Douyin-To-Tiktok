@@ -185,9 +185,9 @@ export default function MochiMascot({
     if (!mounted) return null;
 
     const positions = {
-        'bottom-right': 'fixed bottom-8 right-8 z-50',
-        'bottom-left': 'fixed bottom-8 left-8 z-50',
-        'top-left': 'fixed top-24 left-8 z-50'
+        'bottom-right': 'fixed bottom-8 right-8 z-40', // Lower z-index to not block UI
+        'bottom-left': 'fixed bottom-8 left-8 z-40',
+        'top-left': 'fixed top-24 left-8 z-40'
     };
 
     const sizes = {
