@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
 import path from 'path';
 
 // Check if we are in a production environment (Vercel)
@@ -7,18 +7,20 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // Use in-memory DB for production (Vercel) to avoid read-only FS errors
 // Use local file for development
-const sqlite = new Database(isProduction ? ':memory:' : 'sqlite.db');
+const client = createClient({
+    url: isProduction ? "file::memory:" : "file:sqlite.db"
+});
 
-export const db = drizzle(sqlite);
+export const db = drizzle(client);
 
 // Manual migration for in-memory DB on Vercel
 // This ensures tables exist even if migration files are missing in the bundle
-const runMigrations = () => {
+const runMigrations = async () => {
     try {
-        console.log('Running manual DB migrations...');
+        console.log('Running manual DB migrations (LibSQL)...');
 
         // User table
-        sqlite.exec(`
+        await client.execute(`
             CREATE TABLE IF NOT EXISTS "user" (
                 "id" text PRIMARY KEY NOT NULL,
                 "name" text NOT NULL,
@@ -31,7 +33,7 @@ const runMigrations = () => {
         `);
 
         // Session table
-        sqlite.exec(`
+        await client.execute(`
             CREATE TABLE IF NOT EXISTS "session" (
                 "id" text PRIMARY KEY NOT NULL,
                 "expires_at" integer NOT NULL,
@@ -43,10 +45,10 @@ const runMigrations = () => {
                 "user_id" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE
             );
         `);
-        sqlite.exec(`CREATE INDEX IF NOT EXISTS "session_userId_idx" ON "session" ("user_id");`);
+        await client.execute(`CREATE INDEX IF NOT EXISTS "session_userId_idx" ON "session" ("user_id");`);
 
         // Account table
-        sqlite.exec(`
+        await client.execute(`
             CREATE TABLE IF NOT EXISTS "account" (
                 "id" text PRIMARY KEY NOT NULL,
                 "account_id" text NOT NULL,
@@ -63,10 +65,10 @@ const runMigrations = () => {
                 "updated_at" integer NOT NULL
             );
         `);
-        sqlite.exec(`CREATE INDEX IF NOT EXISTS "account_userId_idx" ON "account" ("user_id");`);
+        await client.execute(`CREATE INDEX IF NOT EXISTS "account_userId_idx" ON "account" ("user_id");`);
 
         // Verification table
-        sqlite.exec(`
+        await client.execute(`
             CREATE TABLE IF NOT EXISTS "verification" (
                 "id" text PRIMARY KEY NOT NULL,
                 "identifier" text NOT NULL,
@@ -76,7 +78,7 @@ const runMigrations = () => {
                 "updated_at" integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
             );
         `);
-        sqlite.exec(`CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification" ("identifier");`);
+        await client.execute(`CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification" ("identifier");`);
 
         console.log('✅ Manual DB migrations completed successfully');
     } catch (error) {
@@ -84,4 +86,5 @@ const runMigrations = () => {
     }
 };
 
+// Fire and forget migration
 runMigrations();
