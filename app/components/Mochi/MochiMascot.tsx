@@ -18,6 +18,21 @@ interface MochiMascotProps {
 
 const RANDOM_LINES = [
     { en: "Did you know? I run on bamboo and code! 🎋", cn: "你知道吗？我是靠竹子和代码运行的！🎋" },
+    { en: "Need help? I'm just a click away!", cn: "需要帮助吗？点击我就行！" },
+    { en: "Automating your content is my superpower! ⚡", cn: "自动化你的内容是我的超能力！⚡" },
+    { en: "I'm watching your growth stats go up! 📈", cn: "我正在看着你的增长数据上升！📈" },
+    { en: "Don't forget to hydrate while you create! 💧", cn: "创作时别忘了喝水！💧" },
+    { en: "Is it time for a snack break yet? 🍪", cn: "是时候吃点零食了吗？🍪" },
+    { en: "Your content is looking fire today! 🔥", cn: "你今天的内容看起来很火！🔥" },
+    { en: "I love seeing your videos go viral! 🌟", cn: "我喜欢看你的视频爆火！🌟" },
+];
+
+const POSITIONS: ('bottom-left' | 'bottom-right' | 'top-left')[] = ['bottom-left', 'bottom-right', 'top-left'];
+
+export default function MochiMascot({
+    messageEn: propMessageEn,
+    messageCn: propMessageCn,
+    autoTalk = false,
     state: propState,
     position: propPosition,
     size = 'md'
