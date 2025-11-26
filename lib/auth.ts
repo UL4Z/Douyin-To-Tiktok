@@ -7,21 +7,16 @@ console.log('GOOGLE_CLIENT_ID exists:', !!process.env.GOOGLE_CLIENT_ID);
 console.log('BETTER_AUTH_URL:', process.env.BETTER_AUTH_URL);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 
-try {
-    export const auth = betterAuth({
-        database: drizzleAdapter(db, {
-            provider: "sqlite",
-        }),
-        socialProviders: {
-            google: {
-                clientId: process.env.GOOGLE_CLIENT_ID as string,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-            },
+export const auth = betterAuth({
+    database: drizzleAdapter(db, {
+        provider: "sqlite",
+    }),
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
-        baseURL: process.env.BETTER_AUTH_URL,
-    });
-    console.log('BetterAuth initialized successfully');
-} catch (e) {
-    console.error('BetterAuth initialization failed:', e);
-    throw e;
-}
+    },
+    baseURL: process.env.BETTER_AUTH_URL,
+});
+console.log('BetterAuth initialized successfully');
