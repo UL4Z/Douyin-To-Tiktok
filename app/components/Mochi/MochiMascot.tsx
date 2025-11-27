@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import SpeechBubble from './SpeechBubble';
+import ChatModal from './ChatModal';
+import { useLanguage } from '../../context/LanguageContext';
 
 type MochiState = 'idle' | 'talking' | 'waving' | 'excited' | 'success' | 'celebrating' | 'coding' | 'thinking' | 'teacher' | 'sleeping' | 'angry' | 'pointing';
 
@@ -12,8 +13,7 @@ interface MochiMascotProps {
     messageCn?: string;
     autoTalk?: boolean;
     state?: MochiState;
-    position?: 'bottom-left' | 'bottom-right' | 'top-left';
-    size?: 'sm' | 'md' | 'lg';
+    className?: string;
 }
 
 const RANDOM_LINES = [
@@ -27,97 +27,165 @@ const RANDOM_LINES = [
     { en: "I love seeing your videos go viral! 🌟", cn: "我喜欢看你的视频爆火！🌟" },
 ];
 
-const POSITIONS: ('bottom-left' | 'bottom-right' | 'top-left')[] = ['bottom-left', 'bottom-right', 'top-left'];
+const TUTORIAL_STEPS: Record<string, { en: string, cn: string, state: MochiState }[]> = {
+    '/': [
+        { en: "Hi! I'm Mochi, your AI assistant! 👋", cn: "嗨！我是 Mochi，你的 AI 助手！👋", state: 'waving' },
+        { en: "I help you automate your content from Douyin to TikTok. 🚀", cn: "我帮你把内容从抖音自动化到 TikTok。🚀", state: 'excited' },
+        { en: "Click 'Get Started' or 'Login' to begin! 🌟", cn: "点击“开始使用”或“登录”以开始！🌟", state: 'pointing' }
+    ],
+    '/login': [
+        { en: "Welcome back! Or are you new here? 🤔", cn: "欢迎回来！还是你是新来的？🤔", state: 'thinking' },
+        { en: "You can sign in with Google for instant access. ⚡", cn: "你可以使用 Google 快速登录。⚡", state: 'pointing' },
+        { en: "Don't worry, your data is safe with me! 🛡️", cn: "别担心，你的数据在我这里很安全！🛡️", state: 'success' }
+    ],
+    '/dashboard': [
+        { en: "This is your Dashboard! Command center ready! 🎮", cn: "这是你的仪表板！指挥中心准备就绪！🎮", state: 'teacher' },
+        { en: "Connect your TikTok account to start syncing. 🔗", cn: "连接你的 TikTok 账号以开始同步。🔗", state: 'pointing' },
+        { en: "Check 'Analytics' to see your growth explode! 💥", cn: "查看“分析”以见证你的增长爆发！💥", state: 'celebrating' }
+    ],
+    '/dashboard/analytics': [
+        { en: "Look at all these numbers! 📊", cn: "看这些数字！📊", state: 'excited' },
+        { en: "Here you can track your followers and likes. 📈", cn: "在这里你可以追踪你的粉丝和点赞。📈", state: 'teacher' },
+        { en: "Keep posting to keep the streak alive! 🔥", cn: "坚持发布以保持连胜！🔥", state: 'success' }
+    ],
+    '/dashboard/profile': [
+        { en: "This is you! Looking good! ✨", cn: "这是你！看起来不错！✨", state: 'waving' },
+        { en: "You can see your achievements and stats here. 🏆", cn: "你可以在这里查看你的成就和统计数据。🏆", state: 'celebrating' },
+        { en: "Don't forget to log out if you're on a public computer! 🔒", cn: "如果你在公共电脑上，别忘了退出登录！🔒", state: 'teacher' }
+    ]
+};
 
 export default function MochiMascot({
     messageEn: propMessageEn,
     messageCn: propMessageCn,
     autoTalk = false,
     state: propState,
-    position: propPosition,
-    size = 'md'
+    className
 }: MochiMascotProps) {
     const pathname = usePathname();
+    const { language } = useLanguage();
     const [mounted, setMounted] = useState(false);
-    const [showBubble, setShowBubble] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [currentState, setCurrentState] = useState<MochiState>('idle');
     const [currentMessage, setCurrentMessage] = useState({ en: '', cn: '' });
-    const [currentPosition, setCurrentPosition] = useState<'bottom-left' | 'bottom-right' | 'top-left'>('bottom-right');
     const [isMouthOpen, setIsMouthOpen] = useState(false);
-    const [isTyping, setIsTyping] = useState(false);
     const [shouldBlink, setShouldBlink] = useState(false);
+
+    // Tutorial State
+    const [tutorialStep, setTutorialStep] = useState(0);
+    const [isTutorialActive, setIsTutorialActive] = useState(false);
+    const [hasSeenTutorial, setHasSeenTutorial] = useState<Record<string, boolean>>({});
 
     // Track last few line indices to prevent repeats
     const lastLineIndicesRef = useRef<number[]>([]);
 
     useEffect(() => {
         setMounted(true);
-
-        // Initial random position if not specified
-        if (!propPosition) {
-            const randomPos = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-            setCurrentPosition(randomPos);
-        } else {
-            setCurrentPosition(propPosition);
+        // Load tutorial history
+        const saved = localStorage.getItem('mochi_tutorials');
+        if (saved) {
+            setHasSeenTutorial(JSON.parse(saved));
         }
-    }, [propPosition]);
+    }, []);
 
-    // Guided Tour Logic based on Pathname
+    // Random Acts of Mochi (Idle Animations)
+    useEffect(() => {
+        if (!mounted || showModal || isTutorialActive) return;
+
+        const idleStates: MochiState[] = ['idle', 'sleeping', 'coding', 'thinking', 'waving'];
+
+        const randomEventInterval = setInterval(() => {
+            // 30% chance to change state every 10 seconds if idle
+            if (Math.random() > 0.7 && !showModal) {
+                const randomState = idleStates[Math.floor(Math.random() * idleStates.length)];
+                setCurrentState(randomState);
+
+                // Reset to idle after a few seconds unless it's sleeping (which lasts longer)
+                const duration = randomState === 'sleeping' ? 8000 : 4000;
+                setTimeout(() => {
+                    if (!showModal) setCurrentState('idle');
+                }, duration);
+            }
+        }, 10000);
+
+        return () => clearInterval(randomEventInterval);
+    }, [mounted, showModal, isTutorialActive]);
+
+    // Tutorial Logic
     useEffect(() => {
         if (!mounted) return;
 
-        let tourMessage = { en: '', cn: '' };
-        let tourState: MochiState = 'idle';
+        const steps = TUTORIAL_STEPS[pathname];
+        const hasSeen = hasSeenTutorial[pathname];
 
-        // Override based on route
-        switch (pathname) {
-            case '/':
-                tourMessage = { en: "Welcome! Click Login to get started. 🚀", cn: "欢迎！点击登录开始使用。🚀" };
-                tourState = 'waving';
-                break;
-            case '/login':
-                tourMessage = { en: "Enter your details to access the dashboard. 🔐", cn: "输入您的详细信息以访问仪表板。🔐" };
-                tourState = 'teacher';
-                break;
-            case '/dashboard':
-                tourMessage = { en: "This is your command center! 🎮", cn: "这是你的指挥中心！🎮" };
-                tourState = 'success';
-                break;
-            default:
-                // Fallback to props or random
-                if (propMessageEn) {
-                    tourMessage = { en: propMessageEn, cn: propMessageCn || propMessageEn };
-                    tourState = propState || 'idle';
-                }
-                break;
-        }
-
-        // Only auto-talk if we have a message (tour or prop) AND autoTalk is true
-        // OR if it's a specific tour page where we ALWAYS want him to greet
-        const isTourPage = ['/', '/login', '/dashboard'].includes(pathname);
-
-        if (tourMessage.en && (autoTalk || isTourPage)) {
-            setCurrentMessage(tourMessage);
-            setCurrentState(tourState);
-            setShowBubble(true);
-            setIsTyping(true);
+        // If there are steps for this page and user hasn't seen them (or autoTalk is forced)
+        if (steps && !hasSeen) {
+            setIsTutorialActive(true);
+            setTutorialStep(0);
+            setCurrentMessage(steps[0]);
+            setCurrentState(steps[0].state); // Set initial state from step
+            setShowModal(true);
+        } else if (propMessageEn && autoTalk) {
+            // Fallback to prop message if provided
+            setCurrentMessage({ en: propMessageEn, cn: propMessageCn || propMessageEn });
+            setShowModal(true);
+            setIsTutorialActive(false);
+            setCurrentState(propState || 'talking');
         } else {
-            setCurrentState(propState || 'idle');
-            setShowBubble(false);
+            setShowModal(false);
+            setIsTutorialActive(false);
+            // Don't force idle here, let the random idle logic take over or keep previous state
+            if (currentState === 'idle') setCurrentState(propState || 'idle');
         }
+    }, [pathname, mounted, propMessageEn, propMessageCn, autoTalk, propState, hasSeenTutorial]);
 
-    }, [pathname, mounted, propMessageEn, propMessageCn, autoTalk, propState]);
+    const handleNextStep = () => {
+        const steps = TUTORIAL_STEPS[pathname];
+        if (!steps) return;
+
+        if (tutorialStep < steps.length - 1) {
+            const nextStep = tutorialStep + 1;
+            setTutorialStep(nextStep);
+            setCurrentMessage(steps[nextStep]);
+            setCurrentState(steps[nextStep].state); // Update state for next step
+        } else {
+            completeTutorial();
+        }
+    };
+
+    const completeTutorial = () => {
+        setShowModal(false);
+        setIsTutorialActive(false);
+        setCurrentState('success'); // Celebrate completion
+        setTimeout(() => setCurrentState('idle'), 3000);
+
+        // Save to local storage
+        const newHistory = { ...hasSeenTutorial, [pathname]: true };
+        setHasSeenTutorial(newHistory);
+        localStorage.setItem('mochi_tutorials', JSON.stringify(newHistory));
+    };
 
     const handleMochiClick = () => {
-        // If already talking, close bubble
-        if (showBubble) {
-            setShowBubble(false);
-            setIsTyping(false);
-            setCurrentState(propState || 'idle');
+        // If modal is open, close it
+        if (showModal) {
+            setShowModal(false);
+            setIsTutorialActive(false);
+            setCurrentState('idle');
             return;
         }
 
-        // Pick a random line that isn't in the last 3 lines
+        // If tutorial exists for this page, restart it
+        const steps = TUTORIAL_STEPS[pathname];
+        if (steps) {
+            setIsTutorialActive(true);
+            setTutorialStep(0);
+            setCurrentMessage(steps[0]);
+            setCurrentState(steps[0].state);
+            setShowModal(true);
+            return;
+        }
+
+        // Otherwise, say something random
         let nextIndex;
         let attempts = 0;
         do {
@@ -125,39 +193,32 @@ export default function MochiMascot({
             attempts++;
         } while (lastLineIndicesRef.current.includes(nextIndex) && attempts < 20);
 
-        // Update history
         const newHistory = [...lastLineIndicesRef.current, nextIndex];
         if (newHistory.length > 3) newHistory.shift();
         lastLineIndicesRef.current = newHistory;
 
         const randomLine = RANDOM_LINES[nextIndex];
-
         setCurrentMessage(randomLine);
         setCurrentState('talking');
-        setShowBubble(true);
-        setIsTyping(true);
+        setShowModal(true);
+        setIsTutorialActive(false);
     };
 
-    // Talking animation: Toggle mouth open/closed while typing
+    // Mouth animation when modal is open
     useEffect(() => {
         let mouthInterval: NodeJS.Timeout;
-
-        if (isTyping) {
-            // Start with mouth open
+        if (showModal) {
             setIsMouthOpen(true);
-
-            // Toggle mouth every 150ms
             mouthInterval = setInterval(() => {
                 setIsMouthOpen(prev => !prev);
-            }, 150);
+            }, 200);
         } else {
             setIsMouthOpen(false);
         }
-
         return () => {
             if (mouthInterval) clearInterval(mouthInterval);
         };
-    }, [isTyping]);
+    }, [showModal]);
 
     // Blink animation
     useEffect(() => {
@@ -168,33 +229,7 @@ export default function MochiMascot({
         return () => clearInterval(blinkInterval);
     }, []);
 
-    const handleTypingComplete = useCallback(() => {
-        setIsTyping(false);
-        setIsMouthOpen(false);
-
-        // Return to idle/prop state after a delay if it was a random click
-        // For tour messages, we might want to keep the bubble a bit longer or let user close it
-        if (!showBubble) return; // Already closed
-
-        // If we want him to stop "talking" body animation but keep bubble:
-        if (currentState === 'talking') {
-            setCurrentState(propState || 'idle');
-        }
-    }, [showBubble, currentState, propState]);
-
     if (!mounted) return null;
-
-    const positions = {
-        'bottom-right': 'fixed bottom-8 right-8 z-40', // Lower z-index to not block UI
-        'bottom-left': 'fixed bottom-8 left-8 z-40',
-        'top-left': 'fixed top-24 left-8 z-40'
-    };
-
-    const sizes = {
-        'sm': 'w-32 h-32',
-        'md': 'w-48 h-48',
-        'lg': 'w-64 h-64'
-    };
 
     const getImageForState = (s: MochiState, mouthOpen: boolean, blink: boolean) => {
         if (blink && s === 'idle') return '/mochi-blink.png';
@@ -246,28 +281,27 @@ export default function MochiMascot({
         angry: { x: [-2, 2, -2, 2, 0], transition: { duration: 0.2, repeat: Infinity } }
     };
 
-    // Determine which animation variant to use
     const getAnimationVariant = () => {
-        if (isTyping) return 'talking';
+        if (showModal) return 'talking';
         return currentState;
     };
 
     return (
-        <div className={positions[currentPosition]}>
+        <div className={`fixed bottom-4 right-4 z-50 md:bottom-8 md:right-8 ${className}`}>
             <div className="relative">
-                <AnimatePresence>
-                    {showBubble && (
-                        <SpeechBubble
-                            messageEn={currentMessage.en}
-                            messageCn={currentMessage.cn}
-                            position={currentPosition}
-                            onTypingComplete={handleTypingComplete}
-                        />
-                    )}
-                </AnimatePresence>
+                <ChatModal
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                    message={language === 'cn' ? currentMessage.cn : currentMessage.en}
+                    isTutorial={isTutorialActive}
+                    step={tutorialStep}
+                    totalSteps={TUTORIAL_STEPS[pathname]?.length || 0}
+                    onNext={handleNextStep}
+                    onSkip={completeTutorial}
+                />
 
                 <motion.div
-                    className={`${sizes[size]} cursor-pointer relative z-40 filter drop-shadow-2xl hover:scale-105 transition-transform duration-300`}
+                    className="w-24 h-24 md:w-48 md:h-48 cursor-pointer relative z-40 filter drop-shadow-2xl hover:scale-105 transition-transform duration-300"
                     onClick={handleMochiClick}
                     variants={variants as any}
                     animate={getAnimationVariant()}

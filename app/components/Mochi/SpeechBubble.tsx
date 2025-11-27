@@ -32,8 +32,6 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
 
         if (timerRef.current) clearInterval(timerRef.current);
 
-        console.log(`🎤 Speech Bubble: Starting typing (${language})`);
-
         timerRef.current = setInterval(() => {
             if (indexRef.current < currentMessage.length) {
                 const nextChar = currentMessage.charAt(indexRef.current);
@@ -43,39 +41,38 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
             } else {
                 if (timerRef.current) clearInterval(timerRef.current);
                 setIsTyping(false);
-                console.log('✅ Speech Bubble: Typing complete');
                 if (onTypingComplete) {
                     onTypingComplete();
                 }
             }
-        }, 40); // Slightly slower for better readability
+        }, 40);
 
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [currentMessage, onTypingComplete]); // Only restart if message changes
+    }, [currentMessage, onTypingComplete]);
 
     const toggleLanguage = (e: React.MouseEvent) => {
         e.stopPropagation();
         setLanguage(prev => prev === 'en' ? 'cn' : 'en');
     };
 
-    // Adjusted positions to overlap Mochi
+    // Duolingo-style: White bubble, light gray border, bold text
     const bubbleStyles = {
         'bottom-right': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-30px]', // More overlap
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-4', // Position above with spacing
+            bubble: 'bg-white border-2 border-[#e5e5e5] shadow-sm',
+            tail: 'absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-b-2 border-r-2 border-[#e5e5e5] transform rotate-45'
         },
         'bottom-left': {
-            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-[-30px]', // More overlap
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-b border-r border-primary/20 transform rotate-45'
+            container: 'absolute bottom-full left-1/2 -translate-x-1/2 mb-4',
+            bubble: 'bg-white border-2 border-[#e5e5e5] shadow-sm',
+            tail: 'absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-b-2 border-r-2 border-[#e5e5e5] transform rotate-45'
         },
         'top-left': {
-            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-[-20px]', // More overlap
-            bubble: 'bg-gradient-to-br from-surface to-secondary border-primary/20',
-            tail: 'absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-secondary border-t border-l border-primary/20 transform rotate-45'
+            container: 'absolute top-full left-1/2 -translate-x-1/2 mt-4',
+            bubble: 'bg-white border-2 border-[#e5e5e5] shadow-sm',
+            tail: 'absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white border-t-2 border-l-2 border-[#e5e5e5] transform rotate-45'
         }
     };
 
@@ -87,27 +84,25 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className={`${currentStyle.container} w-[180px] z-50`} // Smaller width
+            className={`${currentStyle.container} w-[200px] z-50`}
         >
-            <div className={`${currentStyle.bubble} rounded-2xl p-3 text-accent`}>
+            <div className={`${currentStyle.bubble} rounded-2xl p-4 text-[#3c3c3c] relative`}>
                 {/* Header with Language Switch */}
-                <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Mochi</span>
-                    </div>
+                <div className="flex justify-between items-center mb-2">
+                    <span className="text-[11px] font-bold text-[#afafaf] uppercase tracking-wider">Mochi</span>
                     <button
                         onClick={toggleLanguage}
-                        className="flex items-center gap-1 text-[10px] font-bold text-white hover:text-primary transition-colors bg-white/10 border border-white/20 px-3 py-1 rounded-full shadow-sm" // More apparent button
+                        className="flex items-center gap-1 text-[10px] font-bold text-[#afafaf] hover:text-[#1cb0f6] transition-colors bg-[#f7f7f7] px-2 py-1 rounded-full uppercase tracking-wide"
                     >
                         <Globe className="w-3 h-3" />
-                        {language === 'en' ? 'EN' : '中文'}
+                        {language === 'en' ? 'EN' : 'CN'}
                     </button>
                 </div>
 
                 {/* Text Content */}
-                <p className="text-base font-medium leading-relaxed min-h-[3rem]"> {/* Larger text */}
+                <p className="text-[15px] font-bold leading-snug min-h-[2rem]">
                     {displayedText}
-                    {isTyping && <span className="inline-block w-1.5 h-4 bg-primary ml-1 animate-pulse align-middle" />}
+                    {isTyping && <span className="inline-block w-1.5 h-4 bg-[#1cb0f6] ml-1 animate-pulse align-middle rounded-full" />}
                 </p>
 
                 {/* Tail */}

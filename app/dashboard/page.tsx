@@ -1,8 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import TikTokLoader from '../components/TikTokLoader'
+import { motion } from 'framer-motion'
+import { Check, Plus, RefreshCw, AlertCircle, Zap, TrendingUp, Shield, Flame, Clock, ArrowRight } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
+import Link from 'next/link'
 
 interface ProfileData {
     display_name: string
@@ -14,26 +18,34 @@ interface ProfileData {
     bio_description: string
     is_verified: boolean
     discord_username?: string | null
+    is_tiktok_connected: boolean
+    streak?: number
 }
 
-export default function Dashboard() {
+function DashboardContent() {
     const [profile, setProfile] = useState<ProfileData | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
+    const { t } = useLanguage()
 
     const [manualCode, setManualCode] = useState('')
     const [connecting, setConnecting] = useState(false)
+    const searchParams = useSearchParams()
+    const codeParam = searchParams.get('code')
 
     useEffect(() => {
         fetchProfile()
     }, [])
 
+    useEffect(() => {
+        if (codeParam && !profile && !connecting) {
+            handleAutoConnect(codeParam)
+        }
+    }, [codeParam, profile])
+
     const fetchProfile = async () => {
         try {
-            // In development, we might want to skip the API call entirely if we know it's offline
-            // But let's try it, and fallback if it fails.
-
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`, {
                 credentials: 'include'
             })
@@ -43,7 +55,6 @@ export default function Dashboard() {
                     console.log('⚠️ Auth failed (401), but using mock data for development')
                     throw new Error('Unauthorized (Mock fallback)')
                 }
-                // Not authenticated, redirect to OAuth
                 window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok`
                 return
             }
@@ -56,7 +67,6 @@ export default function Dashboard() {
             setProfile(data)
         } catch (err) {
             console.error('Profile fetch failed:', err)
-            // Mock data for offline development
             if (process.env.NODE_ENV === 'development') {
                 console.log('⚠️ Using mock profile data for development')
                 setProfile({
@@ -68,7 +78,9 @@ export default function Dashboard() {
                     video_count: 128,
                     bio_description: 'Mock profile for offline testing 🛠️',
                     is_verified: true,
-                    discord_username: 'DevDiscord#1234'
+                    discord_username: 'DevDiscord#1234',
+                    is_tiktok_connected: false,
+                    streak: 5
                 })
             } else {
                 setError(err instanceof Error ? err.message : 'Unknown error')
@@ -78,310 +90,245 @@ export default function Dashboard() {
         }
     }
 
-    const handleLogout = async () => {
-        try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-                method: 'POST',
-                credentials: 'include'
-            })
-            router.push('/')
-        } catch (err) {
-            console.error('Logout failed:', err)
-        }
-    }
-
-    const handleUnlinkTikTok = async () => {
-        if (!confirm('Are you sure you want to unlink your TikTok account? This will remove all your data.')) return
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok/unlink`, {
-                method: 'POST',
-                credentials: 'include'
-            })
-            if (res.ok) {
-                router.push('/')
-            } else {
-                alert('Failed to unlink TikTok')
-            }
-        } catch (err) {
-            console.error('Unlink failed:', err)
-            alert('Failed to unlink TikTok')
-        }
-    }
-
-    const handleUnlinkDiscord = async () => {
-        if (!confirm('Are you sure you want to unlink your Discord account?')) return
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/discord/unlink`, {
-                method: 'POST',
-                credentials: 'include'
-            })
-            if (res.ok) {
-                // Refresh to show updated state
-                fetchProfile()
-            } else {
-                alert('Failed to unlink Discord')
-            }
-        } catch (err) {
-            console.error('Unlink failed:', err)
-            alert('Failed to unlink Discord')
-        }
-    }
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <TikTokLoader />
-                    <p className="text-gray-400 mt-4">Loading your profile...</p>
-                </div>
-            </div>
-        )
-    }
-
-
-
-    const handleManualConnect = async () => {
-        if (!manualCode) return
+    const handleAutoConnect = async (code: string) => {
         setConnecting(true)
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok/manual`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: manualCode }),
+                body: JSON.stringify({ code }),
                 credentials: 'include'
             })
 
             if (res.ok) {
-                window.location.reload()
+                router.replace('/dashboard')
+                fetchProfile()
             } else {
                 const data = await res.json()
-                setError(data.error || 'Connection failed')
+                if (data.code === 'TIKTOK_ACCOUNT_ALREADY_LINKED') {
+                    setError(t.errors.tiktok_linked)
+                } else {
+                    setError(data.details ? `${data.error}: ${data.details}` : (data.error || t.errors.connection_failed))
+                }
             }
         } catch (err) {
-            setError('Connection failed')
+            setError(t.errors.connection_failed)
         } finally {
             setConnecting(false)
         }
     }
 
-    if (error || !profile) {
+    const handleConnectTikTok = () => {
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok`
+    }
+
+    if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="bg-tiktok-dark-card border border-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold gradient-text mb-2">Connect TikTok</h1>
-                        <p className="text-gray-400">Sandbox Mode: Manual Connection Required</p>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-800">
-                            <h3 className="font-semibold mb-2 text-tiktok-cyan">Step 1: Authorize</h3>
-                            <p className="text-sm text-gray-400 mb-3">
-                                Click below to open TikTok authorization in a new tab.
-                            </p>
-                            <a
-                                href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/tiktok`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block w-full py-3 bg-gray-800 hover:bg-gray-700 text-center rounded-lg transition-colors font-medium"
-                            >
-                                Open Authorization ↗
-                            </a>
-                        </div>
-
-                        <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-800">
-                            <h3 className="font-semibold mb-2 text-tiktok-pink">Step 2: Enter Code</h3>
-                            <p className="text-sm text-gray-400 mb-3">
-                                Copy the <code>code</code> from the URL you are redirected to (e.g. <code>.../?code=THIS_PART&...</code>)
-                            </p>
-                            <input
-                                type="text"
-                                value={manualCode}
-                                onChange={(e) => setManualCode(e.target.value)}
-                                placeholder="Paste code here..."
-                                className="w-full bg-black border border-gray-700 rounded-lg p-3 text-white focus:border-tiktok-pink focus:outline-none mb-3"
-                            />
-                            <button
-                                onClick={handleManualConnect}
-                                disabled={connecting || !manualCode}
-                                className="w-full py-3 bg-gradient-to-r from-tiktok-cyan to-tiktok-pink text-white font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                            >
-                                {connecting ? 'Connecting...' : 'Verify & Connect'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-red-400 text-sm text-center">
-                            {error}
-                        </div>
-                    )}
-                </div>
+            <div className="min-h-[50vh] flex items-center justify-center">
+                <TikTokLoader />
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen p-8">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold gradient-text">Dashboard</h1>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-all"
-                    >
-                        Logout
+        <div className="space-y-8">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-white mb-2">{t.dashboard.title}</h1>
+                    <p className="text-white/40">{t.dashboard.subtitle}</p>
+                </div>
+                {profile && (
+                    <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold">
+                            {profile.display_name.charAt(0)}
+                        </div>
+                        <span className="font-bold">{profile.display_name}</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Error Banner */}
+            {error && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3 text-red-400"
+                >
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <p>{error}</p>
+                </motion.div>
+            )}
+
+            {/* Main Feed */}
+            <div className="grid gap-6">
+                {/* Streak Card */}
+                <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/30 rounded-3xl p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-orange-500 text-black flex items-center justify-center">
+                            <Flame className="w-8 h-8 fill-black" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-orange-400">{profile?.streak || 0} Day Streak!</h3>
+                            <p className="text-white/40">You're on fire! Keep it up.</p>
+                        </div>
+                    </div>
+                    <button className="px-4 py-2 bg-orange-500 text-black font-bold rounded-xl hover:bg-orange-400 transition-colors">
+                        View Calendar
                     </button>
                 </div>
 
-                {/* Profile Card */}
-                <div className="bg-tiktok-dark-card rounded-2xl p-8 mb-8 border border-gray-800">
-                    <div className="flex items-center gap-6">
-                        {profile.avatar ? (
-                            <img
-                                src={profile.avatar}
-                                alt="Profile"
-                                className="w-24 h-24 rounded-full border-2 border-tiktok-cyan"
-                            />
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* 1. TikTok Connection Card */}
+                    <Card
+                        title={t.dashboard.connect_tiktok}
+                        description={profile?.is_tiktok_connected ? t.dashboard.connected_desc : t.dashboard.connect_desc}
+                        icon={<Zap className="w-6 h-6" />}
+                        status={profile?.is_tiktok_connected ? 'completed' : 'active'}
+                    >
+                        {profile?.is_tiktok_connected ? (
+                            <div className="flex items-center gap-2 text-green-400 font-bold bg-green-400/10 px-4 py-2 rounded-xl w-fit">
+                                <Check className="w-5 h-5" />
+                                {t.dashboard.connected_status}
+                            </div>
                         ) : (
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-tiktok-cyan to-tiktok-pink flex items-center justify-center text-4xl">
-                                👤
-                            </div>
+                            <button
+                                onClick={handleConnectTikTok}
+                                disabled={connecting}
+                                className="bg-primary text-black font-bold px-6 py-3 rounded-xl hover:bg-primary/90 transition-all flex items-center gap-2 w-full justify-center"
+                            >
+                                {connecting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                                {t.dashboard.connect_tiktok}
+                            </button>
                         )}
-                        <div>
-                            <h2 className="text-2xl font-bold mb-2">
-                                Welcome, {profile.display_name}! 👋
-                                {profile.is_verified && <span className="ml-2 text-blue-400">✓</span>}
-                            </h2>
-                            <p className="text-gray-400 mb-4">
-                                {profile.bio_description || 'Your TikTok account is connected and ready to automate'}
-                            </p>
+                    </Card>
 
-                            {/* Discord Linking Status */}
-                            <div className="flex items-center gap-3 flex-wrap">
-                                {profile.discord_username ? (
-                                    <>
-                                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#5865F2]/20 border border-[#5865F2]/50 rounded-lg text-[#5865F2]">
-                                            <span className="text-lg">👾</span>
-                                            <span className="font-medium">Linked as {profile.discord_username}</span>
-                                        </div>
-                                        <button
-                                            onClick={handleUnlinkDiscord}
-                                            className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 rounded-lg transition-all text-sm"
-                                        >
-                                            Unlink Discord
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button
-                                        onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/discord`}
-                                        className="flex items-center gap-2 px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-lg transition-all font-medium"
-                                    >
-                                        <span>👾</span>
-                                        Link Discord Account
-                                    </button>
-                                )}
-                                <button
-                                    onClick={handleUnlinkTikTok}
-                                    className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 rounded-lg transition-all text-sm"
-                                >
-                                    Unlink TikTok
-                                </button>
-                            </div>
+                    {/* 2. Analytics Snapshot */}
+                    <Card
+                        title={t.dashboard.analytics_title}
+                        description={t.dashboard.analytics_desc}
+                        icon={<TrendingUp className="w-6 h-6" />}
+                        status={profile?.is_tiktok_connected ? 'active' : 'locked'}
+                    >
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <StatBox label={t.dashboard.followers} value={profile?.follower_count || 0} />
+                            <StatBox label={t.dashboard.likes} value={profile?.likes_count || 0} />
                         </div>
+                        <Link
+                            href="/dashboard/analytics"
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-white/5 hover:bg-white/10 rounded-xl font-bold text-sm uppercase tracking-wide transition-colors"
+                        >
+                            View Full Report
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </Card>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-[#0A0A0A] border-2 border-white/10 rounded-3xl p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-bold">Recent Activity</h3>
                     </div>
-                </div>
 
-                {/* Stats Grid */}
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
-                    <StatCard
-                        label="Followers"
-                        value={profile.follower_count}
-                        icon="👥"
-                    />
-                    <StatCard
-                        label="Total Likes"
-                        value={profile.likes_count}
-                        icon="❤️"
-                    />
-                    <StatCard
-                        label="Videos"
-                        value={profile.video_count}
-                        icon="🎥"
-                    />
-                </div>
-
-                {/* Quick Actions */}
-                <div className="bg-tiktok-dark-card rounded-2xl p-8 border border-gray-800">
-                    <h3 className="text-xl font-semibold mb-6">Quick Actions</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <ActionButton
-                            label="Configure Douyin Source"
-                            description="Set the Douyin profile to monitor"
-                            onClick={() => window.location.href = '/dashboard/config'}
+                    <div className="space-y-4">
+                        <ActivityItem
+                            icon={<Check className="w-4 h-4" />}
+                            title="Profile Synced"
+                            time="2 minutes ago"
+                            color="green"
                         />
-                        <ActionButton
-                            label="Customize Content"
-                            description="Set hashtags and caption templates"
-                            onClick={() => window.location.href = '/dashboard/config'}
+                        <ActivityItem
+                            icon={<Zap className="w-4 h-4" />}
+                            title="Automation Started"
+                            time="1 hour ago"
+                            color="yellow"
                         />
-                        <ActionButton
-                            label="View Analytics"
-                            description="Track your growth and performance"
-                            onClick={() => window.location.href = '/dashboard/analytics'}
-                        />
-                        <ActionButton
-                            label="Automation Settings"
-                            description="Configure posting schedule"
-                            onClick={() => window.location.href = '/dashboard/settings'}
+                        <ActivityItem
+                            icon={<Shield className="w-4 h-4" />}
+                            title="Security Check Passed"
+                            time="5 hours ago"
+                            color="blue"
                         />
                     </div>
-                </div>
-
-                {/* Success Notice */}
-                <div className="mt-8 bg-green-900/20 border border-green-500/30 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold mb-2 text-green-400">✅ Phase 2A Complete!</h4>
-                    <p className="text-gray-300">
-                        Your TikTok account is now connected with real data from the database.
-                        Configuration pages and analytics charts are coming in Phase 2B.
-                    </p>
                 </div>
             </div>
         </div>
     )
 }
 
-function StatCard({ label, value, icon }: { label: string; value: number; icon: string }) {
-    const formatNumber = (num: number) => {
-        if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
-        if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
-        return num.toLocaleString()
+function Card({ title, description, icon, children, status = 'active' }: {
+    title: string,
+    description: string,
+    icon: React.ReactNode,
+    children: React.ReactNode,
+    status?: 'active' | 'completed' | 'locked'
+}) {
+    const isLocked = status === 'locked';
+
+    return (
+        <div className={`
+            relative p-6 rounded-3xl border-2 transition-all h-full flex flex-col
+            ${status === 'completed' ? 'bg-[#0A0A0A] border-white/10' : ''}
+            ${status === 'active' ? 'bg-white/5 border-primary/50 shadow-[0_4px_0_0_rgba(var(--primary-rgb),0.5)]' : ''}
+            ${status === 'locked' ? 'bg-[#0A0A0A] border-white/5 opacity-50' : ''}
+        `}>
+            <div className="flex items-start gap-4 mb-4">
+                <div className={`
+                    w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
+                    ${status === 'completed' ? 'bg-green-500 text-black' : ''}
+                    ${status === 'active' ? 'bg-primary text-black' : ''}
+                    ${status === 'locked' ? 'bg-white/10 text-white/40' : ''}
+                `}>
+                    {status === 'completed' ? <Check className="w-6 h-6" /> : icon}
+                </div>
+                <div>
+                    <h3 className="text-xl font-bold mb-1">{title}</h3>
+                    <p className="text-white/40 text-sm">{description}</p>
+                </div>
+            </div>
+            <div className="mt-auto">
+                {!isLocked && children}
+            </div>
+        </div>
+    )
+}
+
+function StatBox({ label, value }: { label: string, value: number }) {
+    return (
+        <div className="bg-black/20 p-3 rounded-xl border border-white/5">
+            <div className="text-white/40 text-xs uppercase tracking-wider mb-1">{label}</div>
+            <div className="text-xl font-bold font-mono">{value.toLocaleString()}</div>
+        </div>
+    )
+}
+
+function ActivityItem({ icon, title, time, color }: { icon: React.ReactNode, title: string, time: string, color: 'green' | 'yellow' | 'blue' }) {
+    const colors = {
+        green: 'bg-green-500/20 text-green-400',
+        yellow: 'bg-yellow-500/20 text-yellow-400',
+        blue: 'bg-blue-500/20 text-blue-400'
     }
 
     return (
-        <div className="bg-tiktok-dark p-6 rounded-xl border border-gray-800">
-            <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">{icon}</span>
-                <span className="text-gray-400">{label}</span>
+        <div className="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-colors group">
+            <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colors[color]}`}>
+                    {icon}
+                </div>
+                <span className="font-medium group-hover:text-white transition-colors text-white/80">{title}</span>
             </div>
-            <div className="text-3xl font-bold gradient-text">
-                {formatNumber(value)}
-            </div>
+            <span className="text-sm text-white/40">{time}</span>
         </div>
     )
 }
 
-function ActionButton({ label, description, onClick }: { label: string; description: string; onClick: () => void }) {
+export default function DashboardPage() {
     return (
-        <button
-            onClick={onClick}
-            className="p-4 bg-tiktok-dark rounded-lg border border-gray-800 hover:border-tiktok-cyan/50 transition-all group text-left"
-        >
-            <h4 className="font-semibold mb-1 group-hover:text-tiktok-cyan transition-colors">
-                {label}
-            </h4>
-            <p className="text-sm text-gray-400">{description}</p>
-        </button>
+        <Suspense fallback={<div className="text-white">Loading...</div>}>
+            <DashboardContent />
+        </Suspense>
     )
 }

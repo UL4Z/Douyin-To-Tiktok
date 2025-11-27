@@ -1,11 +1,12 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import MochiMascot from './components/Mochi/MochiMascot'
+import { LanguageProvider } from './context/LanguageContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-    title: 'DTT - Douyin to TikTok Automation',
+    title: 'Mochi Mirror - Douyin to TikTok Automation',
     description: 'Seamlessly transfer your Douyin content to TikTok for English-speaking audiences',
 }
 
@@ -17,8 +18,10 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                {children}
-                <MochiMascot autoTalk={true} size="md" />
+                <LanguageProvider>
+                    {children}
+                    <MochiMascot autoTalk={true} />
+                </LanguageProvider>
             </body>
         </html>
     )
