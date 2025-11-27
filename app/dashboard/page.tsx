@@ -195,7 +195,7 @@ function DashboardContent() {
                             <button
                                 onClick={handleConnectTikTok}
                                 disabled={connecting}
-                                className="bg-primary text-black font-bold px-6 py-3 rounded-xl hover:bg-primary/90 transition-all flex items-center gap-2 w-full justify-center"
+                                className="bg-bamboo text-black font-bold px-6 py-3 rounded-xl hover:bg-bamboo-dark transition-all flex items-center gap-2 w-full justify-center"
                             >
                                 {connecting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
                                 {t.dashboard.connect_tiktok}
@@ -271,16 +271,16 @@ function Card({ title, description, icon, children, status = 'active' }: {
     return (
         <div className={`
             relative p-6 rounded-3xl border-2 transition-all h-full flex flex-col
-            ${status === 'completed' ? 'bg-[#0A0A0A] border-white/10' : ''}
-            ${status === 'active' ? 'bg-white/5 border-primary/50 shadow-[0_4px_0_0_rgba(var(--primary-rgb),0.5)]' : ''}
+            ${status === 'completed' ? 'bg-[#0A0A0A] border-bamboo/20' : ''}
+            ${status === 'active' ? 'bg-white/5 border-white/10 hover:border-white/20' : ''}
             ${status === 'locked' ? 'bg-[#0A0A0A] border-white/5 opacity-50' : ''}
         `}>
             <div className="flex items-start gap-4 mb-4">
                 <div className={`
                     w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
-                    ${status === 'completed' ? 'bg-green-500 text-black' : ''}
-                    ${status === 'active' ? 'bg-primary text-black' : ''}
-                    ${status === 'locked' ? 'bg-white/10 text-white/40' : ''}
+                    ${status === 'completed' ? 'bg-bamboo text-black' : ''}
+                    ${status === 'active' ? 'bg-white/10 text-white' : ''}
+                    ${status === 'locked' ? 'bg-white/5 text-white/20' : ''}
                 `}>
                     {status === 'completed' ? <Check className="w-6 h-6" /> : icon}
                 </div>

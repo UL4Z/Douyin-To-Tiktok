@@ -21,6 +21,14 @@ module.exports = {
                 success: 'var(--success)',
                 warning: 'var(--warning)',
                 error: 'var(--error)',
+                bamboo: {
+                    DEFAULT: '#78C850',
+                    dark: '#5da33a',
+                },
+                'bamboo-red': {
+                    DEFAULT: '#FF5B5B',
+                    dark: '#E04F4F',
+                },
             },
             borderRadius: {
                 'xl': '1rem',

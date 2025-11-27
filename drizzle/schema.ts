@@ -25,4 +25,19 @@ export const users = pgTable('users', {
     banned_by: text('banned_by'),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
+    // Automation & Settings
+    automation_enabled: boolean('automation_enabled').default(false),
+    automation_schedule: text('automation_schedule').default('["09:00", "14:00", "19:00"]'), // Stored as JSON string
+    automation_config: text('automation_config').default('{"auto_reply": true, "cross_post": false, "smart_hashtags": true}'), // Stored as JSON string
+    notification_settings: text('notification_settings').default('{"push": true, "email": false}'), // Stored as JSON string
+});
+
+export const activityLogs = pgTable('activity_logs', {
+    id: serial('id').primaryKey(),
+    user_id: integer('user_id').references(() => users.id),
+    type: text('type').notNull(), // 'automation', 'security', 'system'
+    title: text('title').notNull(),
+    description: text('description'),
+    metadata: text('metadata'), // JSON string
+    created_at: timestamp('created_at').defaultNow(),
 });
