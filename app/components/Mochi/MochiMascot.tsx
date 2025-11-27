@@ -287,7 +287,7 @@ export default function MochiMascot({
     };
 
     return (
-        <div className={`fixed bottom-4 right-4 z-50 md:bottom-8 md:right-8 ${className}`}>
+        <div className={`fixed bottom-24 right-4 z-50 md:bottom-8 md:right-8 ${className}`}>
             <div className="relative">
                 <ChatModal
                     isOpen={showModal}

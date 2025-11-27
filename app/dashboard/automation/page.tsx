@@ -8,7 +8,7 @@ import { useLanguage } from '../../context/LanguageContext'
 export default function AutomationPage() {
     const [automationEnabled, setAutomationEnabled] = useState(false)
     const [schedule, setSchedule] = useState(['09:00', '14:00', '19:00'])
-    const [config, setConfig] = useState({ auto_reply: true, cross_post: false, smart_hashtags: true })
+    const [config, setConfig] = useState({ smart_hashtags: true })
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const { t } = useLanguage()
@@ -194,18 +194,6 @@ export default function AutomationPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <ConfigToggle
-                                label="Auto-Reply to Comments"
-                                description="Use AI to reply to comments on your videos"
-                                enabled={config.auto_reply}
-                                onChange={(val) => handleConfigChange('auto_reply', val)}
-                            />
-                            <ConfigToggle
-                                label="Cross-Platform Posting"
-                                description="Automatically post to Instagram Reels"
-                                enabled={config.cross_post}
-                                onChange={(val) => handleConfigChange('cross_post', val)}
-                            />
                             <ConfigToggle
                                 label="Smart Hashtags"
                                 description="Generate trending hashtags for posts"

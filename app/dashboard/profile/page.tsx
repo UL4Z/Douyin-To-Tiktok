@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import BambooLoader from '@/components/BambooLoader';
 import { User, LogOut, Shield, Zap, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
+import confetti from 'canvas-confetti';
 
 interface ProfileData {
     display_name: string;
@@ -29,6 +30,19 @@ export default function ProfilePage() {
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
     }, []);
+
+    useEffect(() => {
+        if (!loading && profile) {
+            // Trigger confetti if user has achievements
+            if (profile.streak > 0 || profile.likes_count > 1000) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+    }, [loading, profile]);
 
     const handleLogout = () => {
         window.location.href = '/api/auth/logout';
@@ -87,6 +101,16 @@ export default function ProfilePage() {
                                 title="Content Machine"
                                 desc="Posted 10+ videos"
                                 active={(profile?.likes_count || 0) > 1000}
+                            />
+                            <Achievement
+                                title="Streak Master"
+                                desc="7 Day Streak"
+                                active={(profile?.streak || 0) >= 7}
+                            />
+                            <Achievement
+                                title="Influencer Status"
+                                desc="10k+ Followers"
+                                active={(profile?.follower_count || 0) >= 10000}
                             />
                         </div>
                     </div>

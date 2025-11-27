@@ -6,7 +6,7 @@ import { Bell, User, Moon, Shield, LogOut, ChevronRight, Smartphone, Globe } fro
 import { useLanguage } from '../../context/LanguageContext'
 
 export default function SettingsPage() {
-    const { t } = useLanguage()
+    const { t, language, setLanguage } = useLanguage()
     const [notifications, setNotifications] = useState({ push: true, email: false })
     const [loading, setLoading] = useState(true)
     const [showUnlinkModal, setShowUnlinkModal] = useState(false)
@@ -86,14 +86,14 @@ export default function SettingsPage() {
                     <SettingsItem
                         icon={<Globe className="w-5 h-5" />}
                         label="Language"
-                        value="English"
-                        onClick={() => { }}
+                        value={language === 'en' ? 'English' : '中文'}
+                        onClick={() => setLanguage(language === 'en' ? 'cn' : 'en')}
                     />
                     <SettingsItem
                         icon={<Smartphone className="w-5 h-5" />}
                         label="Connected Devices"
                         value="2 Active"
-                        onClick={() => { }}
+                        onClick={() => alert('This would show a list of devices to revoke access from.')}
                     />
                 </SettingsSection>
 
@@ -119,7 +119,7 @@ export default function SettingsPage() {
                         icon={<Moon className="w-5 h-5" />}
                         label="Theme"
                         value="Dark Mode"
-                        onClick={() => { }}
+                        onClick={() => alert('Theme switching coming soon! (Currently Dark Mode only)')}
                     />
                 </SettingsSection>
 
