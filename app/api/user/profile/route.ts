@@ -17,10 +17,7 @@ export async function GET() {
 
         // Fetch user from DB with TikTok profile
         const user = await db.query.users.findFirst({
-            where: eq(users.email, session.user.email),
-            with: {
-                tiktokProfile: true // Assuming relation exists, if not we fetch separately
-            }
+            where: eq(users.email, session.user.email)
         })
 
         if (!user) {
