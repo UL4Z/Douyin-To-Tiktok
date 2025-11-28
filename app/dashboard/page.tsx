@@ -8,6 +8,7 @@ import { Check, Plus, RefreshCw, AlertCircle, Zap, TrendingUp, Shield, Flame, Cl
 import { useLanguage } from '../context/LanguageContext'
 import Link from 'next/link'
 import StreakCalendarModal from '@/components/StreakCalendarModal'
+import StreakHeatmap from '@/components/StreakHeatmap'
 
 interface ActivityLog {
     id: number
@@ -298,6 +299,9 @@ function DashboardContent() {
                         </Link>
                     </Card>
                 </div>
+
+                {/* Heatmap */}
+                <StreakHeatmap />
 
                 {/* Recent Activity */}
                 <div className="bg-[#0A0A0A] border-2 border-white/10 rounded-3xl p-6">

@@ -60,11 +60,28 @@ export async function PATCH(req: Request) {
     }
 
     try {
-        const { avatar, bio } = await req.json()
+        const { avatar, bio, display_name, username } = await req.json()
         const updates: any = {}
 
-        if (avatar) updates.avatar_url = avatar
-        if (bio) updates.bio_description = bio
+        if (avatar !== undefined) updates.avatar_url = avatar
+        if (bio !== undefined) updates.bio_description = bio
+        if (display_name !== undefined) updates.display_name = display_name
+
+        if (username) {
+            // Check uniqueness if username is changing
+            const existingUser = await db.query.users.findFirst({
+                where: eq(users.username, username)
+            })
+
+            // If username exists and it's not the current user (we can't easily check current user id here without fetching, 
+            // but we can check if the email matches. If email matches, it's the same user, so it's fine.)
+            // Actually, findFirst will return the user record. We should check if that record's email is different from session email.
+
+            if (existingUser && existingUser.email !== session.user.email) {
+                return NextResponse.json({ error: 'Username already taken' }, { status: 400 })
+            }
+            updates.username = username
+        }
 
         await db.update(users)
             .set(updates)
