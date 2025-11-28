@@ -4,9 +4,18 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import TikTokLoader from '../components/TikTokLoader'
 import { motion } from 'framer-motion'
-import { Check, Plus, RefreshCw, AlertCircle, Zap, TrendingUp, Shield, Flame, Clock, ArrowRight } from 'lucide-react'
+import { Check, Plus, RefreshCw, AlertCircle, Zap, TrendingUp, Shield, Flame, Clock, ArrowRight, User, Settings, LogOut } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import Link from 'next/link'
+import StreakCalendarModal from '@/components/StreakCalendarModal'
+
+interface ActivityLog {
+    id: number
+    type: string
+    title: string
+    description: string
+    created_at: string
+}
 
 interface ProfileData {
     display_name: string
@@ -20,6 +29,7 @@ interface ProfileData {
     discord_username?: string | null
     is_tiktok_connected: boolean
     streak?: number
+    username?: string | null
 }
 
 function DashboardContent() {
@@ -31,11 +41,14 @@ function DashboardContent() {
 
     const [manualCode, setManualCode] = useState('')
     const [connecting, setConnecting] = useState(false)
+    const [activity, setActivity] = useState<ActivityLog[]>([])
+    const [showCalendar, setShowCalendar] = useState(false)
     const searchParams = useSearchParams()
     const codeParam = searchParams.get('code')
 
     useEffect(() => {
         fetchProfile()
+        fetchActivity()
     }, [])
 
     useEffect(() => {
@@ -90,6 +103,18 @@ function DashboardContent() {
         }
     }
 
+    const fetchActivity = async () => {
+        try {
+            const res = await fetch('/api/user/activity')
+            if (res.ok) {
+                const data = await res.json()
+                setActivity(data)
+            }
+        } catch (err) {
+            console.error('Failed to fetch activity:', err)
+        }
+    }
+
     const handleAutoConnect = async (code: string) => {
         setConnecting(true)
         try {
@@ -139,11 +164,35 @@ function DashboardContent() {
                     <p className="text-white/40">{t.dashboard.subtitle}</p>
                 </div>
                 {profile && (
-                    <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold">
-                            {profile.display_name.charAt(0)}
+                    <div className="relative group">
+                        <button className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold">
+                                {profile.display_name.charAt(0)}
+                            </div>
+                            <span className="font-bold hidden md:block">{profile.display_name}</span>
+                        </button>
+
+                        {/* Dropdown */}
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-[#0A0A0A] border border-white/10 rounded-xl shadow-xl overflow-hidden hidden group-hover:block z-50">
+                            <div className="p-2">
+                                <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg text-sm text-white/80">
+                                    <User className="w-4 h-4" />
+                                    Profile
+                                </Link>
+                                <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg text-sm text-white/80">
+                                    <Settings className="w-4 h-4" />
+                                    Settings
+                                </Link>
+                                <div className="h-px bg-white/10 my-1" />
+                                <button
+                                    onClick={() => window.location.href = '/api/auth/signout'}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-red-500/10 text-red-400 rounded-lg text-sm w-full text-left"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    Sign Out
+                                </button>
+                            </div>
                         </div>
-                        <span className="font-bold">{profile.display_name}</span>
                     </div>
                 )}
             </div>
@@ -163,17 +212,20 @@ function DashboardContent() {
             {/* Main Feed */}
             <div className="grid gap-6">
                 {/* Streak Card */}
-                <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/30 rounded-3xl p-6 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-orange-500 text-black flex items-center justify-center">
+                <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/30 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <div className="w-12 h-12 rounded-2xl bg-orange-500 text-black flex items-center justify-center flex-shrink-0">
                             <Flame className="w-8 h-8 fill-black" />
                         </div>
                         <div>
                             <h3 className="text-xl font-bold text-orange-400">{profile?.streak || 0} Day Streak!</h3>
-                            <p className="text-white/40">You're on fire! Keep it up.</p>
+                            <p className="text-white/40 text-sm md:text-base">You're on fire! Keep it up.</p>
                         </div>
                     </div>
-                    <button className="px-4 py-2 bg-orange-500 text-black font-bold rounded-xl hover:bg-orange-400 transition-colors">
+                    <button
+                        onClick={() => setShowCalendar(true)}
+                        className="w-full md:w-auto px-4 py-2 bg-orange-500 text-black font-bold rounded-xl hover:bg-orange-400 transition-colors"
+                    >
                         View Calendar
                     </button>
                 </div>
@@ -197,7 +249,11 @@ function DashboardContent() {
                                 disabled={connecting}
                                 className="bg-bamboo text-black font-bold px-6 py-3 rounded-xl hover:bg-bamboo-dark transition-all flex items-center gap-2 w-full justify-center"
                             >
-                                {connecting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                                {connecting ? <RefreshCw className="w-5 h-5 animate-spin" /> : (
+                                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 1 0 1 7.6 6.83 6.83 0 0 0 6-6.64V7.91a8.56 8.56 0 0 0 4.76 1.46V6.07a4.82 4.82 0 0 1-2.53-.84z" />
+                                    </svg>
+                                )}
                                 {t.dashboard.connect_tiktok}
                             </button>
                         )}
@@ -234,27 +290,28 @@ function DashboardContent() {
                     </div>
 
                     <div className="space-y-4">
-                        <ActivityItem
-                            icon={<Check className="w-4 h-4" />}
-                            title="Profile Synced"
-                            time="2 minutes ago"
-                            color="green"
-                        />
-                        <ActivityItem
-                            icon={<Zap className="w-4 h-4" />}
-                            title="Automation Started"
-                            time="1 hour ago"
-                            color="yellow"
-                        />
-                        <ActivityItem
-                            icon={<Shield className="w-4 h-4" />}
-                            title="Security Check Passed"
-                            time="5 hours ago"
-                            color="blue"
-                        />
+                        {activity.length > 0 ? (
+                            activity.map((log) => (
+                                <ActivityItem
+                                    key={log.id}
+                                    icon={log.type === 'security' ? <Shield className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
+                                    title={log.title}
+                                    time={new Date(log.created_at).toLocaleDateString()}
+                                    color={log.type === 'security' ? 'blue' : 'yellow'}
+                                />
+                            ))
+                        ) : (
+                            <div className="text-white/40 text-center py-4">No recent activity</div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            <StreakCalendarModal
+                isOpen={showCalendar}
+                onClose={() => setShowCalendar(false)}
+                streak={profile?.streak || 0}
+            />
         </div>
     )
 }

@@ -36,7 +36,8 @@ export async function GET() {
             is_verified: user.is_verified || false,
             discord_username: user.discord_username,
             is_tiktok_connected: !!user.tiktok_access_token,
-            streak: 1 // Mock streak for now, will implement DB tracking later
+            streak: user.streak || 0,
+            username: user.username
         })
     } catch (error) {
         console.error('Profile fetch error details:', error)

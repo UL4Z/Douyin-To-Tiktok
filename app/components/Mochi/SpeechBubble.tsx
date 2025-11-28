@@ -84,7 +84,7 @@ export default function SpeechBubble({ messageEn, messageCn, position, onTypingC
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className={`${currentStyle.container} w-[200px] z-50`}
+            className={`${currentStyle.container} w-[160px] md:w-[200px] z-50`}
         >
             <div className={`${currentStyle.bubble} rounded-2xl p-4 text-[#3c3c3c] relative`}>
                 {/* Header with Language Switch */}

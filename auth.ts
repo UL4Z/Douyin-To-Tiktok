@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import { db } from "@/lib/db"
-import { users } from "@/drizzle/schema"
+import { users, activityLogs, devices } from "@/drizzle/schema"
 import { eq } from "drizzle-orm"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -29,23 +29,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     if (!existingUser) {
                         // Create new user
-                        await db.insert(users).values({
+                        const newUser = await db.insert(users).values({
                             email,
                             name,
                             image,
                             display_name: name,
                             avatar_url: image,
+                        }).returning({ id: users.id })
+
+                        // Log creation
+                        await db.insert(activityLogs).values({
+                            user_id: newUser[0].id,
+                            type: 'security',
+                            title: 'Account Created',
+                            description: 'User registered via Google',
+                        })
+
+                        // Track Device (Initial)
+                        await db.insert(devices).values({
+                            user_id: newUser[0].id,
+                            device_name: 'Web Browser',
+                            type: 'desktop',
+                            ip_address: '127.0.0.1',
                         })
                     } else {
-                        // Update existing user (optional, keeps info fresh)
+                        // Update existing user
                         await db.update(users)
                             .set({
                                 name,
                                 image,
-                                avatar_url: image, // Keep avatar synced with Google
+                                avatar_url: image,
                                 updated_at: new Date(),
                             })
                             .where(eq(users.email, email))
+
+                        // Log login
+                        await db.insert(activityLogs).values({
+                            user_id: existingUser.id,
+                            type: 'security',
+                            title: 'New Login',
+                            description: 'User logged in via Google',
+                        })
+
+                        // Track Device
+                        await db.insert(devices).values({
+                            user_id: existingUser.id,
+                            device_name: 'Web Browser',
+                            type: 'desktop',
+                            ip_address: '127.0.0.1',
+                        })
                     }
                     return true
                 } catch (error) {

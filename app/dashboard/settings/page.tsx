@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bell, User, Moon, Shield, LogOut, ChevronRight, Smartphone, Globe } from 'lucide-react'
+import { Bell, User, Moon, Shield, LogOut, ChevronRight, Smartphone, Globe, Monitor } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 
 export default function SettingsPage() {
@@ -10,11 +10,74 @@ export default function SettingsPage() {
     const [notifications, setNotifications] = useState({ push: true, email: false })
     const [loading, setLoading] = useState(true)
     const [showUnlinkModal, setShowUnlinkModal] = useState(false)
-    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [username, setUsername] = useState('')
+    const [devices, setDevices] = useState<any[]>([])
+    const [theme, setTheme] = useState('dark')
 
     useEffect(() => {
         fetchSettings()
+        fetchDevices()
+        fetchProfile()
+        setTheme(localStorage.getItem('theme') || 'dark')
     }, [])
+
+    const fetchProfile = async () => {
+        try {
+            const res = await fetch('/api/user/profile')
+            if (res.ok) {
+                const data = await res.json()
+                if (data.username) setUsername(data.username)
+            }
+        } catch (err) {
+            console.error('Failed to fetch profile:', err)
+        }
+    }
+
+    const fetchDevices = async () => {
+        try {
+            const res = await fetch('/api/user/devices')
+            if (res.ok) {
+                const data = await res.json()
+                setDevices(data)
+            }
+        } catch (error) {
+            console.error('Failed to fetch devices:', error)
+        }
+    }
+
+    const handleUpdateUsername = async () => {
+        try {
+            const res = await fetch('/api/user/username', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+            if (res.ok) {
+                alert('Username updated!')
+            } else {
+                const data = await res.json()
+                alert(data.error || 'Failed to update username')
+            }
+        } catch (err) {
+            console.error('Failed to update username:', err)
+        }
+    }
+
+    const handleRemoveDevice = async (id: number) => {
+        if (!confirm('Are you sure you want to remove this device?')) return
+        try {
+            const res = await fetch('/api/user/devices', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            })
+            if (res.ok) {
+                fetchDevices()
+            }
+        } catch (err) {
+            console.error('Failed to remove device:', err)
+        }
+    }
 
     const fetchSettings = async () => {
         try {
@@ -89,12 +152,62 @@ export default function SettingsPage() {
                         value={language === 'en' ? 'English' : '中文'}
                         onClick={() => setLanguage(language === 'en' ? 'cn' : 'en')}
                     />
-                    <SettingsItem
-                        icon={<Smartphone className="w-5 h-5" />}
-                        label="Connected Devices"
-                        value="2 Active"
-                        onClick={() => alert('This would show a list of devices to revoke access from.')}
-                    />
+                    {/* Username */}
+                    <div className="p-4 border-t border-white/5">
+                        <div className="font-bold mb-2">Username</div>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Set a username"
+                                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-bamboo transition-colors"
+                            />
+                            <button
+                                onClick={handleUpdateUsername}
+                                className="px-4 py-2 bg-bamboo text-white font-bold rounded-xl hover:bg-bamboo-dark transition-colors disabled:opacity-50"
+                                disabled={!username || username.length < 3}
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Connected Devices */}
+                    <div className="p-4 border-t border-white/5 mt-2">
+                        <div className="flex items-center gap-2 mb-3 text-sm font-bold text-white/60">
+                            <Smartphone className="w-4 h-4" />
+                            Connected Devices
+                        </div>
+                        <div className="space-y-2">
+                            {devices.length > 0 ? (
+                                devices.map((device) => (
+                                    <div key={device.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                                                {device.type === 'mobile' ? <Smartphone className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-sm">{device.device_name}</div>
+                                                <div className="text-xs text-white/40">
+                                                    {device.ip_address} • {new Date(device.last_active).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRemoveDevice(device.id)}
+                                            className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            title="Revoke Access"
+                                        >
+                                            <LogOut className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-white/40 text-sm italic">No devices found</div>
+                            )}
+                        </div>
+                    </div>
                 </SettingsSection>
 
                 {/* Notifications Section */}
@@ -115,11 +228,17 @@ export default function SettingsPage() {
 
                 {/* Appearance Section */}
                 <SettingsSection title="Appearance" icon={<Moon className="w-6 h-6" />}>
+
                     <SettingsItem
                         icon={<Moon className="w-5 h-5" />}
                         label="Theme"
-                        value="Dark Mode"
-                        onClick={() => alert('Theme switching coming soon! (Currently Dark Mode only)')}
+                        value={theme === 'light' ? 'Light Mode' : 'Dark Mode'}
+                        onClick={() => {
+                            const next = theme === 'dark' ? 'light' : 'dark'
+                            localStorage.setItem('theme', next)
+                            setTheme(next)
+                            window.location.reload()
+                        }}
                     />
                 </SettingsSection>
 

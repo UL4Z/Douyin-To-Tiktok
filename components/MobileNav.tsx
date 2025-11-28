@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BarChart2, Settings, User } from 'lucide-react';
+import { Home, BarChart2, Settings, User, Zap } from 'lucide-react';
 import { useLanguage } from '../app/context/LanguageContext';
 
 export default function MobileNav() {
@@ -12,6 +12,7 @@ export default function MobileNav() {
     const navItems = [
         { name: t.dashboard.nav_dashboard, href: '/dashboard', icon: Home },
         { name: t.dashboard.nav_analytics, href: '/dashboard/analytics', icon: BarChart2 },
+        { name: 'Automation', href: '/dashboard/automation', icon: Zap },
         { name: t.dashboard.nav_settings, href: '/dashboard/settings', icon: Settings },
         { name: t.dashboard.nav_profile, href: '/dashboard/profile', icon: User },
     ];

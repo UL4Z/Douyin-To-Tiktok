@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react'
+
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, Check, Globe, Zap, Shield } from 'lucide-react'
@@ -8,6 +10,15 @@ import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 export default function Home() {
     const { t } = useLanguage();
+    const [platformIndex, setPlatformIndex] = useState(0);
+    const platforms = ['TikTok', 'Instagram', 'Facebook', 'YouTube'];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setPlatformIndex((prev) => (prev + 1) % platforms.length);
+        }, 2000);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-primary selection:text-black font-sans">
@@ -45,7 +56,9 @@ export default function Home() {
                         transition={{ duration: 0.5 }}
                     >
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
-                            {t.landing.hero_title} <br />
+                            Douyin to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
+                                {platforms[platformIndex]}
+                            </span> <br />
                             <span className="text-primary">{t.landing.hero_subtitle}</span>
                         </h1>
                         <p className="text-xl text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed">
