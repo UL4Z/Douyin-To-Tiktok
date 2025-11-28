@@ -58,7 +58,7 @@ export default function Home() {
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
                             Douyin to <span className="relative inline-block px-2 align-bottom">
                                 <motion.span
-                                    layoutId="highlight"
+                                    layout
                                     className="absolute inset-0 bg-primary -skew-y-2 rounded-lg -z-10"
                                 />
                                 <span className="relative inline-flex flex-col justify-center h-[1.2em] overflow-hidden align-bottom perspective-[1000px] align-text-bottom">
