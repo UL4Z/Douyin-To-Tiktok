@@ -1,10 +1,10 @@
 import './globals.css'
-import { Outfit, ZCOOL_KuaiLe } from 'next/font/google'
+import { Plus_Jakarta_Sans, Noto_Sans_SC } from 'next/font/google'
 import MochiMascot from './components/Mochi/MochiMascot'
 import { LanguageProvider } from './context/LanguageContext'
 
-const outfit = Outfit({ subsets: ['latin'] })
-const zcool = ZCOOL_KuaiLe({ subsets: ['latin'], weight: '400' })
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
+const notoSansSC = Noto_Sans_SC({ subsets: ['latin'], weight: ['400', '500', '700'] })
 
 export const metadata = {
     title: 'Mochi Mirror - Douyin to TikTok Automation',
@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`${outfit.className} ${zcool.className}`}>
+            <body className={`${jakarta.className} ${notoSansSC.className}`}>
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `

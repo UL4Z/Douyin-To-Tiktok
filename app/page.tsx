@@ -21,9 +21,9 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-white selection:bg-primary selection:text-black font-sans">
+        <div className="min-h-screen bg-secondary text-accent selection:bg-primary selection:text-white font-sans transition-colors duration-300">
             {/* Navigation */}
-            <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#0A0A0A]/80 backdrop-blur-xl">
+            <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-secondary/80 backdrop-blur-xl transition-colors duration-300">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <img src="/icon.png" alt="Mochi Mirror Logo" className="w-12 h-12 rounded-lg object-cover" />
@@ -57,8 +57,7 @@ export default function Home() {
                     >
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
                             Douyin to <span className="relative inline-block px-2 align-bottom">
-                                <motion.span
-                                    layout
+                                <span
                                     className="absolute inset-0 bg-primary -skew-y-2 rounded-lg -z-10"
                                 />
                                 <span className="relative inline-flex flex-col justify-center h-[1.2em] overflow-hidden align-bottom perspective-[1000px] align-text-bottom">
@@ -128,7 +127,7 @@ export default function Home() {
             </main>
 
             {/* Value Props */}
-            <section className="py-32 border-t border-white/5 bg-white//[0.02]">
+            <section className="py-32 border-t border-white/5 bg-accent/[0.02]">
                 <div className="container mx-auto px-6">
                     <div className="grid md:grid-cols-3 gap-12">
                         <Feature
@@ -148,16 +147,16 @@ export default function Home() {
             </section>
 
             {/* Footer */}
-            <footer className="py-12 border-t border-white/5 bg-[#0A0A0A] pb-32 md:pb-12">
+            <footer className="py-12 border-t border-white/5 bg-secondary pb-32 md:pb-12 transition-colors duration-300">
                 <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="text-white/40 text-sm">
+                    <div className="text-accent/40 text-sm">
                         © {new Date().getFullYear()} Mochi Mirror. All rights reserved.
                     </div>
                     <div className="flex gap-6">
-                        <Link href="/privacy" className="text-white/40 hover:text-white text-sm transition-colors">
+                        <Link href="/privacy" className="text-accent/40 hover:text-accent text-sm transition-colors">
                             Privacy Policy
                         </Link>
-                        <Link href="/terms" className="text-white/40 hover:text-white text-sm transition-colors">
+                        <Link href="/terms" className="text-accent/40 hover:text-accent text-sm transition-colors">
                             Terms of Service
                         </Link>
                     </div>
@@ -169,12 +168,12 @@ export default function Home() {
 
 function Feature({ title, desc }: { title: string, desc: string }) {
     return (
-        <div className="p-8 rounded-3xl bg-white/5 border border-white/5 hover:border-primary/20 transition-colors">
+        <div className="p-8 rounded-3xl bg-accent/5 border border-white/5 hover:border-primary/20 transition-colors">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary">
                 <Check className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold mb-3">{title}</h3>
-            <p className="text-white/40 leading-relaxed">{desc}</p>
+            <p className="text-accent/40 leading-relaxed">{desc}</p>
         </div>
     )
 }
