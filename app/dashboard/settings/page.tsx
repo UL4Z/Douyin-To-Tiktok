@@ -209,43 +209,119 @@ export default function SettingsPage() {
 
                 {/* Appearance Section */}
                 <SettingsSection title="Appearance" icon={<Moon className="w-6 h-6" />}>
-
                     <SettingsItem
                         icon={<Moon className="w-5 h-5" />}
                         label="Theme"
                         value={theme === 'light' ? 'Light Mode' : 'Dark Mode'}
-                        onClick={onClick}
-                        className="w-full flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors group"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="text-white/40 group-hover:text-bamboo transition-colors">
-                                {icon}
+                        onClick={() => {
+                            const next = theme === 'dark' ? 'light' : 'dark'
+                            localStorage.setItem('theme', next)
+                            setTheme(next)
+                            if (next === 'light') {
+                                document.documentElement.setAttribute('data-theme', 'light')
+                            } else {
+                                document.documentElement.removeAttribute('data-theme')
+                            }
+                        }}
+                    />
+                </SettingsSection>
+
+                {/* Danger Zone */}
+                <div className="bg-red-500/5 border-2 border-red-500/20 rounded-3xl p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center">
+                            <Shield className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-red-400">Danger Zone</h3>
+                            <p className="text-white/40 text-sm">Irreversible actions</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-xl border border-red-500/10">
+                            <div>
+                                <div className="font-bold text-white">Unlink TikTok Account</div>
+                                <div className="text-xs text-white/40">Disconnect your TikTok profile</div>
                             </div>
-                            <span className="font-bold">{label}</span>
+                            <button
+                                onClick={handleUnlink}
+                                className="px-4 py-2 bg-bamboo-red/20 text-bamboo-red font-bold rounded-lg hover:bg-bamboo-red/30 transition-colors text-sm"
+                            >
+                                Unlink
+                            </button>
                         </div>
-                        <div className="flex items-center gap-2 text-white/40">
-                            <span className="text-sm font-medium">{value}</span>
-                            <ChevronRight className="w-5 h-5" />
+
+                        <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-xl border border-red-500/10">
+                            <div>
+                                <div className="font-bold text-white">Delete Account</div>
+                                <div className="text-xs text-white/40">Permanently delete all data</div>
+                            </div>
+                            <button
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-bamboo-red text-white font-bold rounded-lg hover:bg-red-600 transition-colors text-sm"
+                            >
+                                Delete
+                            </button>
                         </div>
-                    </button>
-                    )
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
-                    function ToggleItem({label, description, checked, onChange}: {label: string, description: string, checked: boolean, onChange: (val: boolean) => void }) {
+function SettingsSection({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) {
     return (
-                    <div className="flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors">
-                        <div>
-                            <div className="font-bold">{label}</div>
-                            <div className="text-xs text-white/40">{description}</div>
-                        </div>
-                        <button
-                            onClick={() => onChange(!checked)}
-                            className={`w-12 h-7 rounded-full transition-colors relative ${checked ? 'bg-bamboo' : 'bg-white/10'
-                                }`}
-                        >
-                            <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-transform ${checked ? 'left-6' : 'left-1'
-                                }`} />
-                        </button>
-                    </div>
-                    )
+        <div className="bg-secondary border-2 border-white/10 rounded-3xl p-4 md:p-6">
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center flex-shrink-0">
+                    {icon}
+                </div>
+                <h3 className="text-lg md:text-xl font-bold">{title}</h3>
+            </div>
+            <div className="space-y-2">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+function SettingsItem({ icon, label, value, onClick }: { icon: React.ReactNode, label: string, value: string, onClick: () => void }) {
+    return (
+        <button
+            onClick={onClick}
+            className="w-full flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors group"
+        >
+            <div className="flex items-center gap-4">
+                <div className="text-white/40 group-hover:text-bamboo transition-colors">
+                    {icon}
+                </div>
+                <span className="font-bold">{label}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/40">
+                <span className="text-sm font-medium">{value}</span>
+                <ChevronRight className="w-5 h-5" />
+            </div>
+        </button>
+    )
+}
+
+function ToggleItem({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: (val: boolean) => void }) {
+    return (
+        <div className="flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors">
+            <div>
+                <div className="font-bold">{label}</div>
+                <div className="text-xs text-white/40">{description}</div>
+            </div>
+            <button
+                onClick={() => onChange(!checked)}
+                className={`w-12 h-7 rounded-full transition-colors relative ${checked ? 'bg-bamboo' : 'bg-white/10'
+                    }`}
+            >
+                <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-transform ${checked ? 'left-6' : 'left-1'
+                    }`} />
+            </button>
+        </div>
+    )
 }
