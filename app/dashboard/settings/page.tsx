@@ -214,80 +214,38 @@ export default function SettingsPage() {
                         icon={<Moon className="w-5 h-5" />}
                         label="Theme"
                         value={theme === 'light' ? 'Light Mode' : 'Dark Mode'}
-                        onClick={() => {
-                            const next = theme === 'dark' ? 'light' : 'dark'
-                            localStorage.setItem('theme', next)
-                            setTheme(next)
-                            if (next === 'light') {
-                                document.documentElement.setAttribute('data-theme', 'light')
-                            <div>
-                                <div className="font-bold text-white">Unlink TikTok Account</div>
-                                <div className="text-xs text-white/40">Disconnect your TikTok profile</div>
+                        onClick={onClick}
+                        className="w-full flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors group"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="text-white/40 group-hover:text-bamboo transition-colors">
+                                {icon}
                             </div>
-                            <button
-                                onClick={handleUnlink}
-                                className="px-4 py-2 bg-bamboo-red/20 text-bamboo-red font-bold rounded-lg hover:bg-bamboo-red/30 transition-colors text-sm"
-                            >
-                                Unlink
-                            </button>
+                            <span className="font-bold">{label}</span>
                         </div>
-
-                        <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-xl border border-red-500/10">
-                            <div>
-                                <div className="font-bold text-white">Delete Account</div>
-                                <div className="text-xs text-white/40">Permanently delete all data</div>
-                            </div>
-                            <button
-                                onClick={handleDelete}
-                                className="px-4 py-2 bg-bamboo-red text-white font-bold rounded-lg hover:bg-red-600 transition-colors text-sm"
-                            >
-                                Delete
-                            </button>
+                        <div className="flex items-center gap-2 text-white/40">
+                            <span className="text-sm font-medium">{value}</span>
+                            <ChevronRight className="w-5 h-5" />
                         </div>
-                    </div >
-                </div >
-            </div >
-        </div >
-            </div >
-        </div >
-    )
+                    </button>
+                    )
 }
 
-function SettingsItem({ icon, label, value, onClick }: { icon: React.ReactNode, label: string, value: string, onClick: () => void }) {
+                    function ToggleItem({label, description, checked, onChange}: {label: string, description: string, checked: boolean, onChange: (val: boolean) => void }) {
     return (
-        <button
-            onClick={onClick}
-            className="w-full flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors group"
-        >
-            <div className="flex items-center gap-4">
-                <div className="text-white/40 group-hover:text-bamboo transition-colors">
-                    {icon}
-                </div>
-                <span className="font-bold">{label}</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/40">
-                <span className="text-sm font-medium">{value}</span>
-                <ChevronRight className="w-5 h-5" />
-            </div>
-        </button>
-    )
-}
-
-function ToggleItem({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: (val: boolean) => void }) {
-    return (
-        <div className="flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors">
-            <div>
-                <div className="font-bold">{label}</div>
-                <div className="text-xs text-white/40">{description}</div>
-            </div>
-            <button
-                onClick={() => onChange(!checked)}
-                className={`w-12 h-7 rounded-full transition-colors relative ${checked ? 'bg-bamboo' : 'bg-white/10'
-                    }`}
-            >
-                <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-transform ${checked ? 'left-6' : 'left-1'
-                    }`} />
-            </button>
-        </div>
-    )
+                    <div className="flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors">
+                        <div>
+                            <div className="font-bold">{label}</div>
+                            <div className="text-xs text-white/40">{description}</div>
+                        </div>
+                        <button
+                            onClick={() => onChange(!checked)}
+                            className={`w-12 h-7 rounded-full transition-colors relative ${checked ? 'bg-bamboo' : 'bg-white/10'
+                                }`}
+                        >
+                            <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-transform ${checked ? 'left-6' : 'left-1'
+                                }`} />
+                        </button>
+                    </div>
+                    )
 }
