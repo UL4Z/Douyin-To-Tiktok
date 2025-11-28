@@ -16,12 +16,13 @@ interface ProfileData {
     likes_count: number;
     is_verified: boolean;
     streak: number;
+    username?: string;
 }
 
 export default function ProfilePage() {
     const { t } = useLanguage();
     const [profile, setProfile] = useState<ProfileData | null>(null);
-    const [profile, setProfile] = useState<ProfileData | null>(null);
+
     const [loading, setLoading] = useState(true);
     const [editingUsername, setEditingUsername] = useState(false);
     const [newUsername, setNewUsername] = useState('');

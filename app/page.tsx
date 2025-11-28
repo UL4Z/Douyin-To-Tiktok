@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, Check, Globe, Zap, Shield } from 'lucide-react'
 import { useLanguage } from './context/LanguageContext'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
@@ -56,12 +56,22 @@ export default function Home() {
                         transition={{ duration: 0.5 }}
                     >
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
-                            Douyin to <span className="relative inline-block px-2">
-                                <span className="relative z-10 text-white">{platforms[platformIndex]}</span>
+                            Douyin to <span className="relative inline-block px-2 h-[1.2em] overflow-hidden align-bottom">
+                                <AnimatePresence mode="wait">
+                                    <motion.span
+                                        key={platformIndex}
+                                        initial={{ y: 50, opacity: 0, rotateX: -90 }}
+                                        animate={{ y: 0, opacity: 1, rotateX: 0 }}
+                                        exit={{ y: -50, opacity: 0, rotateX: 90 }}
+                                        transition={{ duration: 0.5, ease: "backOut" }}
+                                        className="absolute inset-0 z-10 text-white block"
+                                    >
+                                        {platforms[platformIndex]}
+                                    </motion.span>
+                                </AnimatePresence>
                                 <motion.span
                                     layoutId="highlight"
                                     className="absolute inset-0 bg-primary -skew-y-2 rounded-lg"
-                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                 />
                             </span> <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">{t.landing.hero_subtitle}</span>
