@@ -11,19 +11,6 @@
   /* Deep Brown/Soft Black (Background) */
   --accent: #FFF8F0;
   /* Cream/Off-White (Text) */
-  --accent-light: #D4C5C5;
-  /* Soft Grey-Brown (Secondary Text) */
-  --surface: #1F1212;
-  /* Darker Brown (Cards/Nav) */
-  --success: #4CAF50;
-  --warning: #FFC107;
-  --error: #FF5252;
-}
-
-body {
-  background-color: var(--secondary);
-  color: var(--accent);
-  font-family: 'Inter', sans-serif;
 }
 
 @layer utilities {

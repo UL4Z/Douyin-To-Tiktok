@@ -21,15 +21,26 @@ interface ProfileData {
 export default function ProfilePage() {
     const { t } = useLanguage();
     const [profile, setProfile] = useState<ProfileData | null>(null);
+    const [profile, setProfile] = useState<ProfileData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [editingUsername, setEditingUsername] = useState(false);
+    const [newUsername, setNewUsername] = useState('');
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
     useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const fetchProfile = () => {
         fetch('/api/user/profile')
             .then(res => res.json())
-            .then(data => setProfile(data))
+            .then(data => {
+                setProfile(data);
+                setNewUsername(data.username || '');
+            })
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
-    }, []);
+    };
 
     useEffect(() => {
         if (!loading && profile) {
@@ -48,6 +59,58 @@ export default function ProfilePage() {
         window.location.href = '/api/auth/logout';
     };
 
+    const handleUpdateUsername = async () => {
+        try {
+            const res = await fetch('/api/user/username', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: newUsername })
+            });
+            if (res.ok) {
+                setEditingUsername(false);
+                fetchProfile();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to update username');
+            }
+        } catch (err) {
+            console.error('Failed to update username:', err);
+        }
+    };
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File too large (max 5MB)');
+            return;
+        }
+
+        setUploadingAvatar(true);
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64 = reader.result as string;
+            try {
+                const res = await fetch('/api/user/profile', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ avatar: base64 })
+                });
+                if (res.ok) {
+                    fetchProfile();
+                } else {
+                    alert('Failed to upload avatar');
+                }
+            } catch (err) {
+                console.error('Avatar upload failed:', err);
+            } finally {
+                setUploadingAvatar(false);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -63,18 +126,54 @@ export default function ProfilePage() {
             <div className="grid gap-6">
                 {/* Profile Header */}
                 <div className="bg-[#1f1f1f] rounded-3xl p-8 border-2 border-white/10 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center text-4xl font-bold text-black border-4 border-[#0A0A0A]">
-                        {profile?.avatar ? (
-                            <img src={profile.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover" />
-                        ) : (
-                            profile?.display_name?.charAt(0) || 'U'
-                        )}
+                    <div className="relative group">
+                        <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center text-4xl font-bold text-black border-4 border-[#0A0A0A] overflow-hidden cursor-pointer hover:opacity-80 transition-opacity" onClick={() => document.getElementById('avatar-upload')?.click()}>
+                            {profile?.avatar ? (
+                                <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                profile?.display_name?.charAt(0) || 'U'
+                            )}
+                            {uploadingAvatar && (
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            type="file"
+                            id="avatar-upload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleAvatarUpload}
+                            disabled={uploadingAvatar}
+                        />
                     </div>
                     <div className="text-center md:text-left flex-1">
-                        <h2 className="text-2xl font-bold mb-2 flex items-center justify-center md:justify-start gap-2">
+                        <h2 className="text-2xl font-bold mb-1 flex items-center justify-center md:justify-start gap-2">
                             {profile?.display_name}
                             {profile?.is_verified && <Shield className="w-5 h-5 text-blue-400 fill-blue-400" />}
                         </h2>
+                        <div className="mb-4 flex items-center justify-center md:justify-start gap-2">
+                            {editingUsername ? (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-white/40">@</span>
+                                    <input
+                                        type="text"
+                                        value={newUsername}
+                                        onChange={(e) => setNewUsername(e.target.value)}
+                                        className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:border-primary w-32"
+                                        autoFocus
+                                    />
+                                    <button onClick={handleUpdateUsername} className="text-xs bg-primary text-black px-2 py-1 rounded font-bold">Save</button>
+                                    <button onClick={() => setEditingUsername(false)} className="text-xs bg-white/10 px-2 py-1 rounded">Cancel</button>
+                                </div>
+                            ) : (
+                                <div className="text-white/40 text-sm flex items-center gap-2 group cursor-pointer" onClick={() => setEditingUsername(true)}>
+                                    @{profile?.username || 'username'}
+                                    <span className="opacity-0 group-hover:opacity-100 text-xs bg-white/10 px-1.5 py-0.5 rounded transition-opacity">Edit</span>
+                                </div>
+                            )}
+                        </div>
                         <p className="text-white/40 mb-4">{profile?.bio_description || 'No bio yet.'}</p>
                         <div className="flex gap-6 justify-center md:justify-start">
                             <Stat label={t.dashboard.followers} value={profile?.follower_count || 0} />

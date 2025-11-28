@@ -136,10 +136,10 @@ export default function SettingsPage() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-                    <p className="text-white/40">Manage your account preferences</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Settings</h1>
+                    <p className="text-white/40 text-sm md:text-base">Manage your account preferences</p>
                 </div>
             </div>
 
@@ -152,26 +152,7 @@ export default function SettingsPage() {
                         value={language === 'en' ? 'English' : '中文'}
                         onClick={() => setLanguage(language === 'en' ? 'cn' : 'en')}
                     />
-                    {/* Username */}
-                    <div className="p-4 border-t border-white/5">
-                        <div className="font-bold mb-2">Username</div>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Set a username"
-                                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-bamboo transition-colors"
-                            />
-                            <button
-                                onClick={handleUpdateUsername}
-                                className="px-4 py-2 bg-bamboo text-white font-bold rounded-xl hover:bg-bamboo-dark transition-colors disabled:opacity-50"
-                                disabled={!username || username.length < 3}
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </div>
+
 
                     {/* Connected Devices */}
                     <div className="p-4 border-t border-white/5 mt-2">
@@ -182,21 +163,21 @@ export default function SettingsPage() {
                         <div className="space-y-2">
                             {devices.length > 0 ? (
                                 devices.map((device) => (
-                                    <div key={device.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                                    <div key={device.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white/5 rounded-xl gap-3">
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
                                                 {device.type === 'mobile' ? <Smartphone className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
                                             </div>
-                                            <div>
-                                                <div className="font-bold text-sm">{device.device_name}</div>
-                                                <div className="text-xs text-white/40">
+                                            <div className="min-w-0">
+                                                <div className="font-bold text-sm truncate">{device.device_name}</div>
+                                                <div className="text-xs text-white/40 truncate">
                                                     {device.ip_address} • {new Date(device.last_active).toLocaleDateString()}
                                                 </div>
                                             </div>
                                         </div>
                                         <button
                                             onClick={() => handleRemoveDevice(device.id)}
-                                            className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors self-end sm:self-center"
                                             title="Revoke Access"
                                         >
                                             <LogOut className="w-4 h-4" />
@@ -237,7 +218,11 @@ export default function SettingsPage() {
                             const next = theme === 'dark' ? 'light' : 'dark'
                             localStorage.setItem('theme', next)
                             setTheme(next)
-                            window.location.reload()
+                            if (next === 'light') {
+                                document.documentElement.setAttribute('data-theme', 'light')
+                            } else {
+                                document.documentElement.removeAttribute('data-theme')
+                            }
                         }}
                     />
                 </SettingsSection>
@@ -289,12 +274,12 @@ export default function SettingsPage() {
 
 function SettingsSection({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) {
     return (
-        <div className="bg-[#0A0A0A] border-2 border-white/10 rounded-3xl p-6">
-            <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center">
+        <div className="bg-[#0A0A0A] border-2 border-white/10 rounded-3xl p-4 md:p-6">
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center flex-shrink-0">
                     {icon}
                 </div>
-                <h3 className="text-xl font-bold">{title}</h3>
+                <h3 className="text-lg md:text-xl font-bold">{title}</h3>
             </div>
             <div className="space-y-2">
                 {children}

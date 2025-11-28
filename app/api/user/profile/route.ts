@@ -47,3 +47,26 @@ export async function GET() {
         }, { status: 500 })
     }
 }
+export async function PATCH(req: Request) {
+    const session = await getSession()
+    if (!session?.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    try {
+        const { avatar, bio } = await req.json()
+        const updates: any = {}
+
+        if (avatar) updates.avatar_url = avatar
+        if (bio) updates.bio_description = bio
+
+        await db.update(users)
+            .set(updates)
+            .where(eq(users.email, session.user.email))
+
+        return NextResponse.json({ success: true })
+    } catch (error) {
+        console.error('Profile update error:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    }
+}
