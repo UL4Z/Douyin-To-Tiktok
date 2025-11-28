@@ -27,7 +27,7 @@ export default function Home() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <img src="/icon.png" alt="Mochi Mirror Logo" className="w-12 h-12 rounded-lg object-cover" />
-                        <span className="font-bold text-xl tracking-tight">Mochi Mirror</span>
+                        <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">Mochi Mirror</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <LanguageSwitcher />
@@ -75,9 +75,10 @@ export default function Home() {
                                 <motion.span
                                     layoutId="highlight"
                                     className="absolute inset-0 bg-primary -skew-y-2 rounded-lg -z-10"
+                                    style={{ zIndex: -1 }}
                                 />
                             </span> <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">{t.landing.hero_subtitle}</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{t.landing.hero_subtitle}</span>
                         </h1>
                         <p className="text-xl text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed">
                             {t.landing.hero_desc}
