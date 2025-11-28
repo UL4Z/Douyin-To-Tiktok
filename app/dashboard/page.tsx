@@ -163,12 +163,12 @@ function DashboardContent() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">{t.dashboard.title}</h1>
-                    <p className="text-white/40">{t.dashboard.subtitle}</p>
+                    <h1 className="text-3xl font-bold text-accent mb-2">{t.dashboard.title}</h1>
+                    <p className="text-accent/40">{t.dashboard.subtitle}</p>
                 </div>
                 {profile && (
                     <div className="relative group">
-                        <button className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+                        <button className="flex items-center gap-3 bg-accent/5 px-4 py-2 rounded-xl border border-white/10 hover:bg-accent/10 transition-colors">
                             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold overflow-hidden">
                                 {profile.avatar ? (
                                     <img src={profile.avatar} alt={profile.display_name} className="w-full h-full object-cover" />
@@ -176,17 +176,17 @@ function DashboardContent() {
                                     profile.display_name.charAt(0)
                                 )}
                             </div>
-                            <span className="font-bold hidden md:block">{profile.display_name}</span>
+                            <span className="font-bold hidden md:block text-accent">{profile.display_name}</span>
                         </button>
 
                         {/* Dropdown */}
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-[#0A0A0A] border border-white/10 rounded-xl shadow-xl overflow-hidden hidden group-hover:block z-50">
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-secondary border border-white/10 rounded-xl shadow-xl overflow-hidden hidden group-hover:block z-50">
                             <div className="p-2">
-                                <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg text-sm text-white/80">
+                                <Link href="/dashboard/profile" className="flex items-center gap-2 px-3 py-2 hover:bg-accent/5 rounded-lg text-sm text-accent/80">
                                     <User className="w-4 h-4" />
                                     Profile
                                 </Link>
-                                <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 rounded-lg text-sm text-white/80">
+                                <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2 hover:bg-accent/5 rounded-lg text-sm text-accent/80">
                                     <Settings className="w-4 h-4" />
                                     Settings
                                 </Link>
@@ -226,7 +226,7 @@ function DashboardContent() {
                         </div>
                         <div>
                             <h3 className="text-xl font-bold text-orange-400">{profile?.streak || 0} Day Streak!</h3>
-                            <p className="text-white/40 text-sm md:text-base">You're on fire! Keep it up.</p>
+                            <p className="text-accent/40 text-sm md:text-base">You're on fire! Keep it up.</p>
                         </div>
                     </div>
                     <button
@@ -292,7 +292,7 @@ function DashboardContent() {
                         </div>
                         <Link
                             href="/dashboard/analytics"
-                            className="flex items-center justify-center gap-2 w-full py-3 bg-white/5 hover:bg-white/10 rounded-xl font-bold text-sm uppercase tracking-wide transition-colors"
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-accent/5 hover:bg-accent/10 rounded-xl font-bold text-sm uppercase tracking-wide transition-colors text-accent"
                         >
                             View Full Report
                             <ArrowRight className="w-4 h-4" />
@@ -304,7 +304,7 @@ function DashboardContent() {
                 <StreakHeatmap />
 
                 {/* Recent Activity */}
-                <div className="bg-[#0A0A0A] border-2 border-white/10 rounded-3xl p-6">
+                <div className="bg-secondary border-2 border-white/10 rounded-3xl p-6">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
                             <Clock className="w-6 h-6" />
@@ -324,7 +324,7 @@ function DashboardContent() {
                                 />
                             ))
                         ) : (
-                            <div className="text-white/40 text-center py-4">No recent activity</div>
+                            <div className="text-accent/40 text-center py-4">No recent activity</div>
                         )}
                     </div>
                 </div>
@@ -351,22 +351,22 @@ function Card({ title, description, icon, children, status = 'active' }: {
     return (
         <div className={`
             relative p-6 rounded-3xl border-2 transition-all h-full flex flex-col
-            ${status === 'completed' ? 'bg-[#0A0A0A] border-bamboo/20' : ''}
-            ${status === 'active' ? 'bg-white/5 border-white/10 hover:border-white/20' : ''}
-            ${status === 'locked' ? 'bg-[#0A0A0A] border-white/5 opacity-50' : ''}
+            ${status === 'completed' ? 'bg-secondary border-bamboo/20' : ''}
+            ${status === 'active' ? 'bg-accent/5 border-white/10 hover:border-white/20' : ''}
+            ${status === 'locked' ? 'bg-secondary border-white/5 opacity-50' : ''}
         `}>
             <div className="flex items-start gap-4 mb-4">
                 <div className={`
                     w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0
                     ${status === 'completed' ? 'bg-bamboo text-black' : ''}
-                    ${status === 'active' ? 'bg-white/10 text-white' : ''}
-                    ${status === 'locked' ? 'bg-white/5 text-white/20' : ''}
+                    ${status === 'active' ? 'bg-accent/10 text-accent' : ''}
+                    ${status === 'locked' ? 'bg-accent/5 text-accent/20' : ''}
                 `}>
                     {status === 'completed' ? <Check className="w-6 h-6" /> : icon}
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold mb-1">{title}</h3>
-                    <p className="text-white/40 text-sm">{description}</p>
+                    <h3 className="text-xl font-bold mb-1 text-accent">{title}</h3>
+                    <p className="text-accent/40 text-sm">{description}</p>
                 </div>
             </div>
             <div className="mt-auto">
@@ -379,8 +379,8 @@ function Card({ title, description, icon, children, status = 'active' }: {
 function StatBox({ label, value }: { label: string, value: number }) {
     return (
         <div className="bg-black/20 p-3 rounded-xl border border-white/5">
-            <div className="text-white/40 text-xs uppercase tracking-wider mb-1">{label}</div>
-            <div className="text-xl font-bold font-mono">{value.toLocaleString()}</div>
+            <div className="text-accent/40 text-xs uppercase tracking-wider mb-1">{label}</div>
+            <div className="text-xl font-bold font-mono text-accent">{value.toLocaleString()}</div>
         </div>
     )
 }
@@ -393,14 +393,14 @@ function ActivityItem({ icon, title, time, color }: { icon: React.ReactNode, tit
     }
 
     return (
-        <div className="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-colors group">
+        <div className="flex items-center justify-between p-3 hover:bg-accent/5 rounded-xl transition-colors group">
             <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colors[color]}`}>
                     {icon}
                 </div>
-                <span className="font-medium group-hover:text-white transition-colors text-white/80">{title}</span>
+                <span className="font-medium group-hover:text-accent transition-colors text-accent/80">{title}</span>
             </div>
-            <span className="text-sm text-white/40">{time}</span>
+            <span className="text-sm text-accent/40">{time}</span>
         </div>
     )
 }

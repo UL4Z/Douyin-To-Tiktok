@@ -60,11 +60,12 @@ export async function PATCH(req: Request) {
     }
 
     try {
-        const { avatar, bio, display_name, username } = await req.json()
+        const { avatar, bio, bio_description, display_name, username } = await req.json()
         const updates: any = {}
 
         if (avatar !== undefined) updates.avatar_url = avatar
         if (bio !== undefined) updates.bio_description = bio
+        if (bio_description !== undefined) updates.bio_description = bio_description
         if (display_name !== undefined) updates.display_name = display_name
 
         if (username) {

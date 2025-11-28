@@ -163,9 +163,9 @@ export default function SettingsPage() {
                         <div className="space-y-2">
                             {devices.length > 0 ? (
                                 devices.map((device) => (
-                                    <div key={device.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white/5 rounded-xl gap-3">
+                                    <div key={device.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-accent/5 rounded-xl gap-3">
                                         <div className="flex items-center gap-3 overflow-hidden">
-                                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
                                                 {device.type === 'mobile' ? <Smartphone className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
                                             </div>
                                             <div className="min-w-0">
@@ -275,7 +275,7 @@ function SettingsSection({ title, icon, children }: { title: string, icon: React
     return (
         <div className="bg-secondary border-2 border-white/10 rounded-3xl p-4 md:p-6">
             <div className="flex items-center gap-4 mb-4 md:mb-6">
-                <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center flex-shrink-0">
                     {icon}
                 </div>
                 <h3 className="text-lg md:text-xl font-bold">{title}</h3>
@@ -291,15 +291,15 @@ function SettingsItem({ icon, label, value, onClick }: { icon: React.ReactNode, 
     return (
         <button
             onClick={onClick}
-            className="w-full flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors group"
+            className="w-full flex items-center justify-between p-4 hover:bg-accent/5 rounded-xl transition-colors group"
         >
             <div className="flex items-center gap-4">
-                <div className="text-white/40 group-hover:text-bamboo transition-colors">
+                <div className="text-accent/40 group-hover:text-bamboo transition-colors">
                     {icon}
                 </div>
-                <span className="font-bold">{label}</span>
+                <span className="font-bold text-accent">{label}</span>
             </div>
-            <div className="flex items-center gap-2 text-white/40">
+            <div className="flex items-center gap-2 text-accent/40">
                 <span className="text-sm font-medium">{value}</span>
                 <ChevronRight className="w-5 h-5" />
             </div>
@@ -309,14 +309,14 @@ function SettingsItem({ icon, label, value, onClick }: { icon: React.ReactNode, 
 
 function ToggleItem({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: (val: boolean) => void }) {
     return (
-        <div className="flex items-center justify-between p-4 hover:bg-white/5 rounded-xl transition-colors">
+        <div className="flex items-center justify-between p-4 hover:bg-accent/5 rounded-xl transition-colors">
             <div>
-                <div className="font-bold">{label}</div>
-                <div className="text-xs text-white/40">{description}</div>
+                <div className="font-bold text-accent">{label}</div>
+                <div className="text-xs text-accent/40">{description}</div>
             </div>
             <button
                 onClick={() => onChange(!checked)}
-                className={`w-12 h-7 rounded-full transition-colors relative ${checked ? 'bg-bamboo' : 'bg-white/10'
+                className={`w-12 h-7 rounded-full transition-colors relative ${checked ? 'bg-bamboo' : 'bg-accent/10'
                     }`}
             >
                 <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-transform ${checked ? 'left-6' : 'left-1'

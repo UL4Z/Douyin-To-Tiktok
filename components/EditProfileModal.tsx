@@ -113,11 +113,11 @@ export default function EditProfileModal({ isOpen, onClose, currentProfile, onUp
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-lg bg-[#1f1f1f] border border-white/10 rounded-3xl p-6 shadow-2xl overflow-hidden"
+                        className="relative w-full max-w-lg bg-secondary border border-accent/10 rounded-3xl p-6 shadow-2xl overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-bold text-white">Edit Profile</h2>
-                            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white">
+                            <h2 className="text-2xl font-bold text-accent">Edit Profile</h2>
+                            <button onClick={onClose} className="p-2 hover:bg-accent/10 rounded-full transition-colors text-accent/60 hover:text-accent">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -133,11 +133,11 @@ export default function EditProfileModal({ isOpen, onClose, currentProfile, onUp
                             {/* Avatar Upload */}
                             <div className="flex justify-center">
                                 <div className="relative group cursor-pointer">
-                                    <div className="w-24 h-24 rounded-full bg-black/40 border-2 border-white/10 overflow-hidden flex items-center justify-center">
+                                    <div className="w-24 h-24 rounded-full bg-accent/10 border-2 border-accent/10 overflow-hidden flex items-center justify-center">
                                         {avatarPreview ? (
                                             <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-2xl font-bold text-white/20">
+                                            <span className="text-2xl font-bold text-accent/20">
                                                 {formData.display_name?.charAt(0) || 'U'}
                                             </span>
                                         )}
@@ -156,36 +156,36 @@ export default function EditProfileModal({ isOpen, onClose, currentProfile, onUp
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-white/60 mb-1">Display Name</label>
+                                    <label className="block text-sm font-medium text-accent/60 mb-1">Display Name</label>
                                     <input
                                         type="text"
                                         value={formData.display_name}
                                         onChange={e => setFormData({ ...formData, display_name: e.target.value })}
-                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                                        className="w-full bg-accent/5 border border-accent/10 rounded-xl px-4 py-3 text-accent focus:outline-none focus:border-primary transition-colors"
                                         placeholder="Your Name"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-white/60 mb-1">Username</label>
+                                    <label className="block text-sm font-medium text-accent/60 mb-1">Username</label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">@</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-accent/40">@</span>
                                         <input
                                             type="text"
                                             value={formData.username}
                                             onChange={e => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })}
-                                            className="w-full bg-black/20 border border-white/10 rounded-xl pl-8 pr-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                                            className="w-full bg-accent/5 border border-accent/10 rounded-xl pl-8 pr-4 py-3 text-accent focus:outline-none focus:border-primary transition-colors"
                                             placeholder="username"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-white/60 mb-1">Bio</label>
+                                    <label className="block text-sm font-medium text-accent/60 mb-1">Bio</label>
                                     <textarea
                                         value={formData.bio_description}
                                         onChange={e => setFormData({ ...formData, bio_description: e.target.value })}
-                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors h-24 resize-none"
+                                        className="w-full bg-accent/5 border border-accent/10 rounded-xl px-4 py-3 text-accent focus:outline-none focus:border-primary transition-colors h-24 resize-none"
                                         placeholder="Tell us about yourself..."
                                     />
                                 </div>
@@ -195,7 +195,7 @@ export default function EditProfileModal({ isOpen, onClose, currentProfile, onUp
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-colors"
+                                    className="flex-1 px-4 py-3 bg-accent/5 hover:bg-accent/10 text-accent font-bold rounded-xl transition-colors"
                                 >
                                     Cancel
                                 </button>

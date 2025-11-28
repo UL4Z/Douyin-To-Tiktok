@@ -69,12 +69,12 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="p-8 max-w-4xl mx-auto text-white">
+        <div className="p-8 max-w-4xl mx-auto text-accent">
             <h1 className="text-3xl font-bold mb-8">{t.dashboard.nav_profile}</h1>
 
             <div className="grid gap-6">
                 {/* Profile Header */}
-                <div className="bg-[#1f1f1f] rounded-3xl p-8 border-2 border-white/10 flex flex-col md:flex-row items-center gap-8">
+                <div className="bg-secondary rounded-3xl p-8 border-2 border-accent/10 flex flex-col md:flex-row items-center gap-8">
                     <div className="relative group">
                         <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center text-4xl font-bold text-black border-4 border-[#0A0A0A] overflow-hidden">
                             {profile?.avatar ? (
@@ -90,11 +90,11 @@ export default function ProfilePage() {
                             {profile?.is_verified && <Shield className="w-5 h-5 text-blue-400 fill-blue-400" />}
                         </h2>
                         <div className="mb-4 flex items-center justify-center md:justify-start gap-2">
-                            <div className="text-white/40 text-sm flex items-center gap-2">
+                            <div className="text-accent/40 text-sm flex items-center gap-2">
                                 @{profile?.username || 'username'}
                             </div>
                         </div>
-                        <p className="text-white/40 mb-4">{profile?.bio_description || 'No bio yet.'}</p>
+                        <p className="text-accent/40 mb-4">{profile?.bio_description || 'No bio yet.'}</p>
                         <div className="flex gap-6 justify-center md:justify-start">
                             <Stat label={t.dashboard.followers} value={profile?.follower_count || 0} />
                             <Stat label={t.dashboard.likes} value={profile?.likes_count || 0} />
@@ -102,7 +102,7 @@ export default function ProfilePage() {
                         </div>
                         <button
                             onClick={() => setIsEditModalOpen(true)}
-                            className="mt-6 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-2 rounded-xl transition-colors"
+                            className="mt-6 bg-accent/10 hover:bg-accent/20 text-accent font-bold px-6 py-2 rounded-xl transition-colors"
                         >
                             Edit Profile
                         </button>
@@ -111,7 +111,7 @@ export default function ProfilePage() {
 
                 {/* Achievements / Stats Cards */}
                 <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-[#1f1f1f] rounded-3xl p-6 border-2 border-white/10">
+                    <div className="bg-secondary rounded-3xl p-6 border-2 border-accent/10">
                         <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
                             <Award className="w-6 h-6 text-yellow-400" />
                             Achievements
@@ -140,7 +140,7 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    <div className="bg-[#1f1f1f] rounded-3xl p-6 border-2 border-white/10">
+                    <div className="bg-secondary rounded-3xl p-6 border-2 border-accent/10">
                         <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
                             <Zap className="w-6 h-6 text-primary" />
                             Actions
@@ -177,20 +177,20 @@ function Stat({ label, value }: { label: string, value: number }) {
     return (
         <div>
             <div className="font-bold text-xl">{value.toLocaleString()}</div>
-            <div className="text-xs text-white/40 uppercase tracking-wider">{label}</div>
+            <div className="text-xs text-accent/40 uppercase tracking-wider">{label}</div>
         </div>
     );
 }
 
 function Achievement({ title, desc, active }: { title: string, desc: string, active: boolean }) {
     return (
-        <div className={`flex items-center gap-4 p-3 rounded-xl border-2 ${active ? 'bg-white/5 border-primary/20' : 'bg-black/20 border-transparent opacity-50'}`}>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${active ? 'bg-primary text-black' : 'bg-white/10 text-white/20'}`}>
+        <div className={`flex items-center gap-4 p-3 rounded-xl border-2 ${active ? 'bg-accent/5 border-primary/20' : 'bg-accent/5 border-transparent opacity-50'}`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${active ? 'bg-primary text-black' : 'bg-accent/10 text-accent/20'}`}>
                 <Award className="w-6 h-6" />
             </div>
             <div>
                 <div className="font-bold">{title}</div>
-                <div className="text-sm text-white/40">{desc}</div>
+                <div className="text-sm text-accent/40">{desc}</div>
             </div>
         </div>
     );
