@@ -20,6 +20,7 @@ interface ActivityLog {
 interface ProfileData {
     display_name: string
     avatar: string | null
+    tiktok_avatar: string | null
     follower_count: number
     following_count: number
     likes_count: number
@@ -85,6 +86,7 @@ function DashboardContent() {
                 setProfile({
                     display_name: 'Dev User',
                     avatar: null,
+                    tiktok_avatar: null,
                     follower_count: 12500,
                     following_count: 42,
                     likes_count: 50000,
@@ -166,8 +168,12 @@ function DashboardContent() {
                 {profile && (
                     <div className="relative group">
                         <button className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
-                            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold">
-                                {profile.display_name.charAt(0)}
+                            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold overflow-hidden">
+                                {profile.avatar ? (
+                                    <img src={profile.avatar} alt={profile.display_name} className="w-full h-full object-cover" />
+                                ) : (
+                                    profile.display_name.charAt(0)
+                                )}
                             </div>
                             <span className="font-bold hidden md:block">{profile.display_name}</span>
                         </button>
@@ -235,7 +241,20 @@ function DashboardContent() {
                     <Card
                         title={t.dashboard.connect_tiktok}
                         description={profile?.is_tiktok_connected ? t.dashboard.connected_desc : t.dashboard.connect_desc}
-                        icon={<Zap className="w-6 h-6" />}
+                        icon={
+                            profile?.is_tiktok_connected && profile.avatar && profile.tiktok_avatar ? (
+                                <div className="relative w-12 h-8">
+                                    <div className="absolute top-0 left-0 w-8 h-8 rounded-full border-2 border-[#0A0A0A] overflow-hidden z-20">
+                                        <img src={profile.avatar} alt="Google" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="absolute top-0 left-4 w-8 h-8 rounded-full border-2 border-[#0A0A0A] overflow-hidden z-10">
+                                        <img src={profile.tiktok_avatar} alt="TikTok" className="w-full h-full object-cover" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <Zap className="w-6 h-6" />
+                            )
+                        }
                         status={profile?.is_tiktok_connected ? 'completed' : 'active'}
                     >
                         {profile?.is_tiktok_connected ? (

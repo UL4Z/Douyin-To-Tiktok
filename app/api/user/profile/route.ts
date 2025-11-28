@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { users } from '@/drizzle/schema'
+import { users, tiktokProfiles } from '@/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { auth } from '@/auth' // Assuming auth.ts exports auth helper or we use getServerSession
 
@@ -15,19 +15,28 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        // Fetch user from DB
+        // Fetch user from DB with TikTok profile
         const user = await db.query.users.findFirst({
-            where: eq(users.email, session.user.email)
+            where: eq(users.email, session.user.email),
+            with: {
+                tiktokProfile: true // Assuming relation exists, if not we fetch separately
+            }
         })
 
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
+        // Fetch TikTok profile separately if relation is not set up in schema query builder
+        const tiktokProfile = await db.query.tiktokProfiles.findFirst({
+            where: eq(tiktokProfiles.userId, user.id)
+        })
+
         // Map DB fields to ProfileData interface
         return NextResponse.json({
             display_name: user.display_name || user.name || 'User',
             avatar: user.avatar_url || user.image,
+            tiktok_avatar: tiktokProfile?.avatarUrl || null,
             follower_count: user.follower_count || 0,
             following_count: user.following_count || 0,
             likes_count: user.likes_count || 0,
