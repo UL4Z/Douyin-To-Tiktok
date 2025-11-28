@@ -310,7 +310,7 @@ function DashboardContent() {
             <StreakCalendarModal
                 isOpen={showCalendar}
                 onClose={() => setShowCalendar(false)}
-                streak={profile?.streak || 0}
+                currentStreak={profile?.streak || 0}
             />
         </div>
     )
