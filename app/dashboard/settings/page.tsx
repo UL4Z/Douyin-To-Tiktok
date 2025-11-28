@@ -138,8 +138,8 @@ export default function SettingsPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Settings</h1>
-                    <p className="text-white/40 text-sm md:text-base">Manage your account preferences</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-accent mb-2">Settings</h1>
+                    <p className="text-accent/40 text-sm md:text-base">Manage your account preferences</p>
                 </div>
             </div>
 
@@ -220,27 +220,6 @@ export default function SettingsPage() {
                             setTheme(next)
                             if (next === 'light') {
                                 document.documentElement.setAttribute('data-theme', 'light')
-                            } else {
-                                document.documentElement.removeAttribute('data-theme')
-                            }
-                        }}
-                    />
-                </SettingsSection>
-
-                {/* Danger Zone */}
-                <div className="bg-red-500/5 border-2 border-red-500/20 rounded-3xl p-6">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center">
-                            <Shield className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-red-400">Danger Zone</h3>
-                            <p className="text-white/40 text-sm">Irreversible actions</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-xl border border-red-500/10">
                             <div>
                                 <div className="font-bold text-white">Unlink TikTok Account</div>
                                 <div className="text-xs text-white/40">Disconnect your TikTok profile</div>
@@ -265,26 +244,12 @@ export default function SettingsPage() {
                                 Delete
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-function SettingsSection({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) {
-    return (
-        <div className="bg-[#0A0A0A] border-2 border-white/10 rounded-3xl p-4 md:p-6">
-            <div className="flex items-center gap-4 mb-4 md:mb-6">
-                <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center flex-shrink-0">
-                    {icon}
-                </div>
-                <h3 className="text-lg md:text-xl font-bold">{title}</h3>
-            </div>
-            <div className="space-y-2">
-                {children}
-            </div>
-        </div>
+                    </div >
+                </div >
+            </div >
+        </div >
+            </div >
+        </div >
     )
 }
 

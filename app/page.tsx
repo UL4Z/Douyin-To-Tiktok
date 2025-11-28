@@ -56,27 +56,28 @@ export default function Home() {
                         transition={{ duration: 0.5 }}
                     >
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
-                            Douyin to <span className="relative inline-flex flex-col justify-center px-2 h-[1.2em] overflow-hidden align-bottom perspective-[1000px] align-text-bottom">
-                                {/* Invisible spacer for width */}
-                                <span className="opacity-0 relative z-0" aria-hidden="true">{platforms[platformIndex]}</span>
-
-                                <AnimatePresence mode="wait">
-                                    <motion.span
-                                        key={platformIndex}
-                                        initial={{ opacity: 0, rotateX: -90, y: '100%' }}
-                                        animate={{ opacity: 1, rotateX: 0, y: 0 }}
-                                        exit={{ opacity: 0, rotateX: 90, y: '-100%' }}
-                                        transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
-                                        className="absolute inset-0 z-10 text-white flex items-center justify-center"
-                                    >
-                                        {platforms[platformIndex]}
-                                    </motion.span>
-                                </AnimatePresence>
+                            Douyin to <span className="relative inline-block px-2 align-bottom">
                                 <motion.span
                                     layoutId="highlight"
                                     className="absolute inset-0 bg-primary -skew-y-2 rounded-lg -z-10"
-                                    style={{ zIndex: -1 }}
                                 />
+                                <span className="relative inline-flex flex-col justify-center h-[1.2em] overflow-hidden align-bottom perspective-[1000px] align-text-bottom">
+                                    {/* Invisible spacer for width */}
+                                    <span className="opacity-0 relative z-0" aria-hidden="true">{platforms[platformIndex]}</span>
+
+                                    <AnimatePresence mode="wait">
+                                        <motion.span
+                                            key={platformIndex}
+                                            initial={{ opacity: 0, rotateX: -90, y: '100%' }}
+                                            animate={{ opacity: 1, rotateX: 0, y: 0 }}
+                                            exit={{ opacity: 0, rotateX: 90, y: '-100%' }}
+                                            transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
+                                            className="absolute inset-0 z-10 text-white flex items-center justify-center"
+                                        >
+                                            {platforms[platformIndex]}
+                                        </motion.span>
+                                    </AnimatePresence>
+                                </span>
                             </span> <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{t.landing.hero_subtitle}</span>
                         </h1>
