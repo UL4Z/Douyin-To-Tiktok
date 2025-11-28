@@ -1,9 +1,9 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import { Outfit } from 'next/font/google'
 import MochiMascot from './components/Mochi/MochiMascot'
 import { LanguageProvider } from './context/LanguageContext'
 
-const inter = Inter({ subsets: ['latin'] })
+const outfit = Outfit({ subsets: ['latin'] })
 
 export const metadata = {
     title: 'Mochi Mirror - Douyin to TikTok Automation',
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className}>
+            <body className={outfit.className}>
                 <LanguageProvider>
                     {children}
                     <MochiMascot autoTalk={true} />

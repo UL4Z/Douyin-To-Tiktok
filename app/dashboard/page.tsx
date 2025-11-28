@@ -250,8 +250,8 @@ function DashboardContent() {
                                 className="bg-bamboo text-black font-bold px-6 py-3 rounded-xl hover:bg-bamboo-dark transition-all flex items-center gap-2 w-full justify-center"
                             >
                                 {connecting ? <RefreshCw className="w-5 h-5 animate-spin" /> : (
-                                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 1 0 1 7.6 6.83 6.83 0 0 0 6-6.64V7.91a8.56 8.56 0 0 0 4.76 1.46V6.07a4.82 4.82 0 0 1-2.53-.84z" />
+                                    <svg viewBox="0 0 448 512" fill="currentColor" className="w-5 h-5">
+                                        <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z" />
                                     </svg>
                                 )}
                                 {t.dashboard.connect_tiktok}

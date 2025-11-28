@@ -56,10 +56,15 @@ export default function Home() {
                         transition={{ duration: 0.5 }}
                     >
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
-                            Douyin to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-                                {platforms[platformIndex]}
+                            Douyin to <span className="relative inline-block px-2">
+                                <span className="relative z-10 text-white">{platforms[platformIndex]}</span>
+                                <motion.span
+                                    layoutId="highlight"
+                                    className="absolute inset-0 bg-primary -skew-y-2 rounded-lg"
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                />
                             </span> <br />
-                            <span className="text-primary">{t.landing.hero_subtitle}</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">{t.landing.hero_subtitle}</span>
                         </h1>
                         <p className="text-xl text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed">
                             {t.landing.hero_desc}
